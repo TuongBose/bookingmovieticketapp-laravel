@@ -1,0 +1,50 @@
+<!-- src/app/statistics/statistics.component.html -->
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Thống kê tháng {{ currentMonth }}</h3>
+  
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+      {{ errorMessage }}
+    </div>
+  
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm p-4 text-center">
+          <h5 class="card-title">Tổng doanh thu</h5>
+          <p class="card-text display-4 text-primary">
+            {{ totalRevenue | currency:'VND':'symbol':'1.0-0' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+          <h5 class="card-title">Top 3 phim được đặt nhiều nhất</h5>
+          <canvas #barChartCanvas></canvas>
+        </div>
+      </div>
+  
+      <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+          <h5 class="card-title">Top 3 phim được đặt nhiều nhất</h5>
+          <canvas #pieChartCanvas></canvas>
+        </div>
+      </div>
+    </div>
+  
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm p-4">
+          <h5 class="card-title">Rạp được đặt nhiều nhất</h5>
+          <div *ngIf="!mostBookedCinema?.cinemaId" class="text-muted">
+            Không có dữ liệu
+          </div>
+          <div *ngIf="mostBookedCinema?.cinemaId">
+            <p><strong>Tên rạp:</strong> {{ mostBookedCinema.cinemaName }}</p>
+            <p><strong>Số lượng đặt:</strong> {{ mostBookedCinema.totalBookings }} vé</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

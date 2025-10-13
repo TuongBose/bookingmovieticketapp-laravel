@@ -1,0 +1,45 @@
+name: frontendapp
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.0.2
+  provider: ^6.0.5
+  intl: ^0.17.0
+  http: ^0.13.6
+  email_validator: ^3.0.0
+  url_launcher: ^6.1.11
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  shared_preferences: ^2.3.2
+  image_picker: ^0.8.7+4
+  permission_handler: ^11.2.0
+  mime: ^1.0.0
+  http_parser: ^4.0.0
+  flutter_cache_manager: ^3.3.1
+  webview_flutter: ^4.8.0
+  crypto: ^3.0.3
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.20.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/bear.jpg
+    - assets/images/logo-bear.png
+    - assets/images/login_banner.png
+    - assets/images/momo_icon.png
+    - assets/images/vnpay_icon.png
+    - assets/images/zalopay_icon.png
+    - assets/images/shopeepay_icon.png

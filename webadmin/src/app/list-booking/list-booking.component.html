@@ -1,0 +1,188 @@
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Danh sách đặt vé</h3>
+
+    <!-- Spinner khi đang tải -->
+    <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+    </div>
+
+    <!-- Thông báo lỗi -->
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+        {{ errorMessage }}
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="filter-section mb-4" *ngIf="!isLoading">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="userIdFilter" class="form-label">Lọc theo User ID</label>
+                <input type="number" class="form-control" id="userIdFilter" [(ngModel)]="userIdFilter"
+                    placeholder="Nhập User ID">
+            </div>
+            <div class="col-md-3">
+                <label for="showtimeIdFilter" class="form-label">Lọc theo Showtime ID</label>
+                <input type="number" class="form-control" id="showtimeIdFilter" [(ngModel)]="showtimeIdFilter"
+                    placeholder="Nhập Showtime ID">
+            </div>
+            <div class="col-md-3">
+                <label for="dateFilter" class="form-label">Lọc theo ngày đặt</label>
+                <input type="date" class="form-control" id="dateFilter" [(ngModel)]="dateFilter"
+                    placeholder="Chọn ngày">
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button class="btn btn-primary w-50" (click)="applyFilters()">Tìm kiếm</button>
+                <button class="btn btn-secondary w-50" (click)="resetFilters()">Xóa bộ lọc</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="bookingTabs" role="tablist" *ngIf="!isLoading && !errorMessage">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" [class.active]="activeTab === 'all'" (click)="setActiveTab('all')" id="all-tab"
+                data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all"
+                aria-selected="true">
+                Tất cả
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" [class.active]="activeTab === 'active'" (click)="setActiveTab('active')"
+                id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab"
+                aria-controls="active" aria-selected="false">
+                Đang hoạt động
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" [class.active]="activeTab === 'inactive'" (click)="setActiveTab('inactive')"
+                id="inactive-tab" data-bs-toggle="tab" data-bs-target="#inactive" type="button" role="tab"
+                aria-controls="inactive" aria-selected="false">
+                Không hoạt động
+            </button>
+        </li>
+    </ul>
+
+    <!-- Nội dung của tabs -->
+    <div class="tab-content" id="bookingTabsContent" *ngIf="!isLoading && !errorMessage">
+        <!-- Tab Tất cả -->
+        <div class="tab-pane fade" [class.show]="activeTab === 'all'" [class.active]="activeTab === 'all'" id="all"
+            role="tabpanel" aria-labelledby="all-tab">
+            <div class="booking-list">
+                <div *ngFor="let group of bookingsByDate">
+                    <h5 class="date-header">{{ group.date }}</h5>
+                    <hr class="date-divider">
+                    <div class="booking-row">
+                        <div class="booking-card" *ngFor="let booking of group.bookings">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Booking #{{ booking.id }}</h5>
+                                    <p class="card-text"><strong>User ID: </strong> {{ booking.userId }}</p>
+                                    <p class="card-text"><strong>Showtime ID: </strong> {{ booking.showTimeId }}</p>
+                                    <p class="card-text"><strong>Ngày đặt: </strong> {{ booking.bookingdate | date:'dd/MM/yyyy HH:mm' }}</p>
+                                    <p class="card-text"><strong>Tổng giá: </strong> {{ booking.totalprice | currency:'VND' }}</p>
+                                    <p class="card-text"><strong>Phương thức thanh toán: </strong> {{ booking.paymentmethod }}</p>
+                                    <p class="card-text"><strong>Trạng thái thanh toán: </strong> 
+                                        <span [ngClass]="{
+                                            'payment-completed': booking.paymentstatus === 'COMPLETED',
+                                            'payment-pending': booking.paymentstatus === 'PENDING'
+                                        }">{{ booking.paymentstatus }}</span>
+                                    </p>
+                                    <p class="card-text"><strong>Trạng thái: </strong> 
+                                        <span [ngClass]="{
+                                            'status-active': booking.isactive,
+                                            'status-inactive': !booking.isactive
+                                        }">{{ booking.isactive ? 'Hoạt động' : 'Không hoạt động' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!bookingsByDate.length" class="text-center text-muted">
+                    Không có đặt vé nào.
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Đang hoạt động -->
+        <div class="tab-pane fade" [class.show]="activeTab === 'active'" [class.active]="activeTab === 'active'"
+            id="active" role="tabpanel" aria-labelledby="active-tab">
+            <div class="booking-list">
+                <div *ngFor="let group of bookingsByDate">
+                    <h5 class="date-header">{{ group.date }}</h5>
+                    <hr class="date-divider">
+                    <div class="booking-row">
+                        <div class="booking-card" *ngFor="let booking of group.bookings">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Booking #{{ booking.id }}</h5>
+                                    <p class="card-text"><strong>User ID: </strong> {{ booking.userId }}</p>
+                                    <p class="card-text"><strong>Showtime ID: </strong> {{ booking.showTimeId }}</p>
+                                    <p class="card-text"><strong>Ngày đặt: </strong> {{ booking.bookingdate | date:'dd/MM/yyyy HH:mm' }}</p>
+                                    <p class="card-text"><strong>Tổng giá: </strong> {{ booking.totalprice | currency:'VND' }}</p>
+                                    <p class="card-text"><strong>Phương thức thanh toán: </strong> {{ booking.paymentmethod }}</p>
+                                    <p class="card-text"><strong>Trạng thái thanh toán: </strong> 
+                                        <span [ngClass]="{
+                                            'payment-completed': booking.paymentstatus === 'COMPLETED',
+                                            'payment-pending': booking.paymentstatus === 'PENDING'
+                                        }">{{ booking.paymentstatus }}</span>
+                                    </p>
+                                    <p class="card-text"><strong>Trạng thái: </strong> 
+                                        <span [ngClass]="{
+                                            'status-active': booking.isactive,
+                                            'status-inactive': !booking.isactive
+                                        }">{{ booking.isactive ? 'Hoạt động' : 'Không hoạt động' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!bookingsByDate.length" class="text-center text-muted">
+                    Không có đặt vé đang hoạt động.
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Không hoạt động -->
+        <div class="tab-pane fade" [class.show]="activeTab === 'inactive'" [class.active]="activeTab === 'inactive'"
+            id="inactive" role="tabpanel" aria-labelledby="inactive-tab">
+            <div class="booking-list">
+                <div *ngFor="let group of bookingsByDate">
+                    <h5 class="date-header">{{ group.date }}</h5>
+                    <hr class="date-divider">
+                    <div class="booking-row">
+                        <div class="booking-card" *ngFor="let booking of group.bookings">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Booking #{{ booking.id }}</h5>
+                                    <p class="card-text"><strong>User ID: </strong> {{ booking.userId }}</p>
+                                    <p class="card-text"><strong>Showtime ID: </strong> {{ booking.showTimeId }}</p>
+                                    <p class="card-text"><strong>Ngày đặt: </strong> {{ booking.bookingdate | date:'dd/MM/yyyy HH:mm' }}</p>
+                                    <p class="card-text"><strong>Tổng giá: </strong> {{ booking.totalprice | currency:'VND' }}</p>
+                                    <p class="card-text"><strong>Phương thức thanh toán: </strong> {{ booking.paymentmethod }}</p>
+                                    <p class="card-text"><strong>Trạng thái thanh toán: </strong> 
+                                        <span [ngClass]="{
+                                            'payment-completed': booking.paymentstatus === 'COMPLETED',
+                                            'payment-pending': booking.paymentstatus === 'PENDING'
+                                        }">{{ booking.paymentstatus }}</span>
+                                    </p>
+                                    <p class="card-text"><strong>Trạng thái: </strong> 
+                                        <span [ngClass]="{
+                                            'status-active': booking.isactive,
+                                            'status-inactive': !booking.isactive
+                                        }">{{ booking.isactive ? 'Hoạt động' : 'Không hoạt động' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!bookingsByDate.length" class="text-center text-muted">
+                    Không có đặt vé không hoạt động.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

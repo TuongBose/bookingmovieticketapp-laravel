@@ -1,0 +1,187 @@
+<!-- src/app/list-showtime/list-showtime.component.html -->
+
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Quản lý suất chiếu</h3>
+
+    <!-- Nút Thêm suất chiếu -->
+    <div class="text-end mb-4">
+        <button class="btn btn-success" (click)="openAddShowtimeModal()">Thêm suất chiếu</button>
+        <hr />
+    </div>
+
+    <!-- Spinner khi đang tải -->
+    <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+    </div>
+
+    <!-- Thông báo thành công -->
+    <div *ngIf="successMessage" class="alert alert-success text-center">
+        {{ successMessage }}
+    </div>
+
+    <!-- Thông báo lỗi -->
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+        {{ errorMessage }}
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="filter-section mb-4" *ngIf="!isLoading">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="cinemaId" class="form-label">Chọn rạp</label>
+                <select class="form-control" id="cinemaId" [(ngModel)]="selectedCinemaId" (ngModelChange)="selectedCinemaId = $event ? +$event : null">
+                    <option [ngValue]="null" disabled>Chọn rạp</option>
+                    <option *ngFor="let cinema of cinemas" [ngValue]="cinema.id">
+                        {{ cinema.name }} ({{ cinema.city }})
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date" class="form-label">Chọn ngày</label>
+                <input type="date" class="form-control" id="date" [(ngModel)]="selectedDate">
+            </div>
+            <div class="col-md-3">
+                <label for="movieId" class="form-label">Chọn phim (tùy chọn)</label>
+                <select class="form-control" id="movieId" [(ngModel)]="selectedMovieId" (ngModelChange)="selectedMovieId = $event ? +$event : null">
+                    <option [ngValue]="null">Tất cả phim</option>
+                    <option *ngFor="let movie of movies" [ngValue]="movie.id">
+                        {{ movie.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="showOnlyActive" [(ngModel)]="showOnlyActive">
+                    <label class="form-check-label" for="showOnlyActive">Chỉ hiển thị suất chiếu hoạt động</label>
+                </div>
+                <button class="btn btn-primary w-50" (click)="fetchShowtimes()">Tìm kiếm</button>
+                <button class="btn btn-secondary w-50" (click)="resetFilters()">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách suất chiếu -->
+    <div class="showtime-list" *ngIf="!isLoading">
+        <div *ngFor="let group of showtimesByMovie">
+            <hr class="movie-divider">            
+            <div class="movie-header d-flex align-items-center mb-3">
+                <img [src]="group.posterURL" alt="{{ group.movieName }}" class="movie-poster me-3" />
+                <h5>{{ group.movieName }}</h5>
+            </div>
+            <div class="showtime-row">
+                <div class="showtime-card" *ngFor="let showtime of group.showtimes">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Suất chiếu #{{ showtime.id }}</h5>
+                            <p class="card-text"><strong>Phim:</strong> {{ group.movieName }}</p>
+                            <p class="card-text"><strong>Phòng:</strong> {{ showtime.roomId }}</p>
+                            <p class="card-text"><strong>Ngày chiếu:</strong> {{ showtime.showdate | date:'dd/MM/yyyy' }}</p>
+                            <p class="card-text"><strong>Giờ bắt đầu:</strong> {{ showtime.starttime | date:'HH:mm' }}</p>
+                            <p class="card-text"><strong>Giá vé:</strong> {{ showtime.price | currency:'VND' }}</p>
+                            <p class="card-text"><strong>Số ghế đã đặt:</strong> {{ bookingsCountMap.get(showtime.id) || 0 }}</p>
+                            <p class="card-text"><strong>Trạng thái: </strong> 
+                                <span [ngClass]="{
+                                    'status-active': showtime.isactive,
+                                    'status-inactive': !showtime.isactive
+                                }">{{ showtime.isactive ? 'Hoạt động' : 'Không hoạt động' }}</span>
+                            </p>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-info btn-sm" (click)="viewDetails(showtime.id)">Xem chi tiết</button>
+                                <button class="btn btn-sm" [ngClass]="showtime.isactive ? 'btn-danger' : 'btn-success'" (click)="toggleShowtimeStatus(showtime.id, showtime.isactive)">
+                                    {{ showtime.isactive ? 'Tắt' : 'Bật' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="!showtimesByMovie.length && !isLoading && !errorMessage" class="text-center text-muted">
+            Không có suất chiếu nào.
+        </div>
+    </div>
+
+    <!-- Modal để thêm suất chiếu -->
+    <ng-template #addShowtimeModal let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title">Thêm suất chiếu mới</h4>
+            <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div *ngIf="errorMessage" class="alert alert-danger text-center">
+            {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="alert alert-success text-center">
+            {{ successMessage }}
+        </div>
+        <div class="modal-body">
+            <form #addShowtimeForm="ngForm" (ngSubmit)="addShowtime()">
+                <div class="mb-3">
+                    <label for="cinemaId" class="form-label">Chọn rạp</label>
+                    <select class="form-select" id="cinemaId" name="cinemaId" [(ngModel)]="newShowtime.cinemaId" (ngModelChange)="onCinemaChange($event)" required>
+                        <option value="0" disabled>Chọn rạp</option>
+                        <option *ngFor="let cinema of cinemas" [value]="cinema.id">
+                            {{ cinema.name }} ({{ cinema.city }})
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="movieId" class="form-label">Chọn phim</label>
+                    <select class="form-select" id="movieId" name="movieId" [(ngModel)]="newShowtime.movieId" required>
+                        <option value="0" disabled>Chọn phim</option>
+                        <option *ngFor="let movie of movies" [value]="movie.id">
+                            {{ movie.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="roomId" class="form-label">Chọn phòng</label>
+                    <select class="form-select" id="roomId" name="roomId" [(ngModel)]="newShowtime.roomId" required>
+                        <option value="0" disabled>Chọn phòng</option>
+                        <option *ngFor="let room of rooms" [value]="room.id">
+                            {{ room.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="showdate" class="form-label">Ngày chiếu</label>
+                    <input type="date" class="form-control" id="showdate" name="showdate" [(ngModel)]="newShowtime.showdate" required>
+                </div>
+                <div class="mb-3">
+                    <label for="starttime" class="form-label">Giờ bắt đầu</label>
+                    <input type="time" class="form-control" id="starttime" name="starttime" [(ngModel)]="newShowtime.starttime" required>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Giá vé (VND)</label>
+                    <input type="number" class="form-control" id="price" name="price" [(ngModel)]="newShowtime.price" required>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="!addShowtimeForm.valid">Thêm suất chiếu</button>
+                <button type="button" class="btn btn-secondary ms-2" (click)="modal.dismiss('Close click')">Hủy</button>
+            </form>
+        </div>
+    </ng-template>
+
+    <ng-template #showtimeDetailModal let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title">Chi tiết suất chiếu #{{ selectedShowtime?.id }}</h4>
+            <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <p><strong>Phim:</strong> {{ selectedShowtimeMovieName }}</p>
+            <p><strong>Phòng:</strong> {{ selectedShowtime?.roomId }}</p>
+            <p><strong>Ngày chiếu:</strong> {{ selectedShowtime?.showdate | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Giờ bắt đầu:</strong> {{ selectedShowtime?.starttime | date:'HH:mm' }}</p>
+            <p><strong>Giá vé:</strong> {{ selectedShowtime?.price | currency:'VND' }}</p>
+            <p><strong>Trạng thái:</strong> 
+                <span [ngClass]="{
+                    'status-active': selectedShowtime?.isactive,
+                    'status-inactive': !selectedShowtime?.isactive
+                }">{{ selectedShowtime?.isactive ? 'Hoạt động' : 'Không hoạt động' }}</span>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close click')">Đóng</button>
+        </div>
+    </ng-template>
+</div>

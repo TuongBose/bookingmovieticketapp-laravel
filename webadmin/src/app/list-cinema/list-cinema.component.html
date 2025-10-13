@@ -1,0 +1,189 @@
+<div class="container mt-4">
+  <h3 class="text-center mb-4">Danh sách rạp chiếu phim</h3>
+
+  <!-- Nút Thêm rạp -->
+  <div class="text-end mb-4">
+    <button class="btn btn-success" (click)="openAddCinemaModal()">Thêm rạp</button>
+    <hr />
+  </div>
+
+  <!-- Spinner khi đang tải -->
+  <div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Đang tải...</span>
+    </div>
+  </div>
+
+  <!-- Thông báo thành công -->
+  <div *ngIf="successMessage" class="alert alert-success text-center">
+    {{ successMessage }}
+  </div>
+
+  <!-- Thông báo lỗi -->
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Dropdown chọn thành phố -->
+  <div class="mb-4">
+    <label for="citySelect" class="form-label">Chọn thành phố:</label>
+    <select id="citySelect" class="form-select" [(ngModel)]="selectedCity" (change)="filterCinemas()">
+      <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+    </select>
+  </div>
+
+  <!-- Danh sách rạp chiếu phim -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col" *ngFor="let cinema of filteredCinemas">
+      <div class="card h-100 shadow-sm">
+        <img [src]="getCinemaImageUrl(cinema.id, cinema.imagename)" class="card-img-top" alt="{{ cinema.name }}"
+          style="width: 100%; height: 225px; object-fit: cover;" (error)="onImageError($event, cinema.id)" />
+        <div class="card-body">
+          <h5 class="card-title">{{ cinema.name }}</h5>
+          <p class="card-text text-muted">Thành phố: {{ cinema.city }}</p>
+          <p class="card-text">Địa chỉ: {{ cinema.address }}</p>
+          <p class="card-text">Số điện thoại: {{ cinema.phonenumber }}</p>
+          <p class="card-text">Tọa độ: <a href="#" (click)="openGoogleMaps(cinema.coordinates)" target="_blank">{{
+              cinema.coordinates }}</a></p>
+          <p class="card-text">Số phòng chiếu tối đa: {{ cinema.maxroom }}</p>
+          <p class="card-text">Trạng thái: <span style="font-weight: bold;"
+              [ngClass]="{'text-success': cinema.isactive, 'text-danger': !cinema.isactive}">{{ cinema.isactive ? 'Đang
+              hoạt động' : 'Ngưng hoạt động' }}</span></p>
+          <div class="d-flex justify-content-between mt-3">
+            <button class="btn btn-warning btn-sm" (click)="openEditCinemaModal(cinema)">Chỉnh sửa</button>
+            <button class="btn btn-sm" [ngClass]="cinema.isactive? 'btn-danger' : 'btn-success'" (click)="toggleActive(cinema.id, !cinema.isactive)">
+              {{ cinema.isactive ? 'Ngưng hoạt động' : 'Kích hoạt' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Hiển thị thông báo nếu không có rạp -->
+    <div *ngIf="!filteredCinemas.length && !isLoading && !errorMessage && !successMessage"
+      class="text-center text-muted col-12">
+      Hiện không có rạp chiếu phim nào.
+    </div>
+  </div>
+
+  <!-- Modal để thêm rạp -->
+  <ng-template #addCinemaModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Thêm rạp chiếu phim mới</h4>
+      <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success text-center">
+      {{ successMessage }}
+    </div>
+    <div class="modal-body">
+      <form #addCinemaForm="ngForm" (ngSubmit)="addCinema()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Tên rạp</label>
+          <input type="text" class="form-control" id="name" name="name" [(ngModel)]="name" required>
+        </div>
+        <div class="mb-3">
+          <label for="city" class="form-label">Thành phố</label>
+          <select class="form-select" id="city" name="city" [(ngModel)]="city" required>
+            <option *ngFor="let province of provinces" [value]="province.name">{{ province.name }}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="coordinates" class="form-label">Tọa độ (latitude, longitude)</label>
+          <input type="text" class="form-control" id="coordinates" name="coordinates" [(ngModel)]="coordinates"
+            required>
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Địa chỉ</label>
+          <input type="text" class="form-control" id="address" name="address" [(ngModel)]="address" required>
+        </div>
+        <div class="mb-3">
+          <label for="phonenumber" class="form-label">Số điện thoại</label>
+          <input type="text" class="form-control" id="phonenumber" name="phonenumber" [(ngModel)]="phonenumber"
+            required>
+        </div>
+        <div class="mb-3">
+          <label for="maxroom" class="form-label">Số phòng chiếu tối đa</label>
+          <input type="number" class="form-control" id="maxroom" name="maxroom" [(ngModel)]="maxroom" required>
+        </div>
+        <div class="mb-3">
+          <label for="isactive" class="form-label">Trạng thái</label>
+          <select class="form-select" id="isactive" name="isactive" [(ngModel)]="isactive">
+            <option value="true">Đang hoạt động</option>
+            <option value="false">Ngưng hoạt động</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="imagename" class="form-label">Tải lên hình ảnh</label>
+          <input type="file" class="form-control" id="imagename" name="imagename" (change)="onImageSelected($event)"
+            accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="!addCinemaForm.valid">Thêm rạp</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="modal.dismiss('Close click')">Hủy</button>
+      </form>
+    </div>
+  </ng-template>
+
+  <!-- Modal để chỉnh sửa rạp -->
+  <ng-template #editCinemaModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Chỉnh sửa rạp chiếu phim</h4>
+      <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success text-center">
+      {{ successMessage }}
+    </div>
+    <div class="modal-body">
+      <form #editCinemaForm="ngForm" (ngSubmit)="updateCinema()">
+        <div class="mb-3">
+          <label for="editName" class="form-label">Tên rạp</label>
+          <input type="text" class="form-control" id="editName" name="editName" [(ngModel)]="editCinema.name" required>
+        </div>
+        <div class="mb-3">
+          <label for="editCity" class="form-label">Thành phố</label>
+          <select class="form-select" id="editCity" name="editCity" [(ngModel)]="editCinema.city" required>
+            <option *ngFor="let province of provinces" [value]="province.name">{{ province.name }}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="editCoordinates" class="form-label">Tọa độ (latitude, longitude)</label>
+          <input type="text" class="form-control" id="editCoordinates" name="editCoordinates"
+            [(ngModel)]="editCinema.coordinates" required>
+        </div>
+        <div class="mb-3">
+          <label for="editAddress" class="form-label">Địa chỉ</label>
+          <input type="text" class="form-control" id="editAddress" name="editAddress" [(ngModel)]="editCinema.address"
+            required>
+        </div>
+        <div class="mb-3">
+          <label for="editPhonenumber" class="form-label">Số điện thoại</label>
+          <input type="text" class="form-control" id="editPhonenumber" name="editPhonenumber"
+            [(ngModel)]="editCinema.phonenumber" required>
+        </div>
+        <div class="mb-3">
+          <label for="editMaxroom" class="form-label">Số phòng chiếu tối đa</label>
+          <input type="number" class="form-control" id="editMaxroom" name="editMaxroom" [(ngModel)]="editCinema.maxroom"
+            required>
+        </div>
+        <div class="mb-3">
+          <label for="editIsactive" class="form-label">Trạng thái</label>
+          <select class="form-select" id="editIsactive" name="editIsactive" [(ngModel)]="editCinema.isactive">
+            <option value="true">Đang hoạt động</option>
+            <option value="false">Ngưng hoạt động</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="imagename" class="form-label">Tải lên hình ảnh</label>
+          <input type="file" class="form-control" id="imagename" name="imagename" (change)="onImageSelected($event)"
+            accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="!editCinemaForm.valid">Lưu thay đổi</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="modal.dismiss('Cross click')">Hủy</button>
+      </form>
+    </div>
+  </ng-template>
+</div>

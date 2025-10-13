@@ -1,0 +1,35 @@
+services:
+  mysql-php-container:
+    container_name: mysql-php-container
+    image: mysql:8.2.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_PORT}:3306"
+
+  # php-container:
+  #   container_name: php-container
+  #   build: 
+  #     context: ../php
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "${PHP_PORT}:80"
+  #   volumes:
+  #     - ../php:/var/www/html
+  #   depends_on:
+  #     - mysql-php-container
+
+  backend-container:
+    container_name: backend-container
+    build: 
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "${LARAVEL_PORT}:8000"
+    volumes:
+      - ../backend:/var/www/html
+    depends_on:
+      - mysql-php-container
+volumes:
+  mysql_data:

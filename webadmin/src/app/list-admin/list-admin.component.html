@@ -1,0 +1,128 @@
+<div class="container mt-4">
+  <h3 class="text-center mb-4">Danh sách tài khoản Admin</h3>
+
+  <!-- Spinner khi đang tải -->
+  <div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Đang tải...</span>
+    </div>
+  </div>
+
+  <!-- Thông báo thành công -->
+  <div *ngIf="successMessage" class="alert alert-success text-center" (click)="successMessage = null">
+    {{ successMessage }}
+  </div>
+
+  <!-- Thông báo lỗi -->
+  <div *ngIf="errorMessage" class="alert alert-danger text-center" (click)="errorMessage = null">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Danh sách admin -->
+  <div class="table-responsive" *ngIf="!isLoading && !errorMessage">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên</th>
+          <th>Email</th>
+          <th>Số điện thoại</th>
+          <th>Password</th>
+          <th>Địa chỉ</th>
+          <th>Ngày sinh</th>
+          <th>Ngày tạo</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let admin of admins">
+          <td>{{ isCurrentUser(admin.id) ? admin.id : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? admin.name : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? admin.email : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? admin.phonenumber : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? admin.password : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? (admin.address || 'Chưa có') : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? (admin.dateofbirth | date:'dd/MM/yyyy') : '******' }}</td>
+          <td>{{ isCurrentUser(admin.id) ? (admin.createdat | date:'dd/MM/yyyy HH:mm') : '******' }}</td>
+          <td>
+            <span *ngIf="isCurrentUser(admin.id)" [ngClass]="{
+              'status-active': admin.isactive,
+              'status-inactive': !admin.isactive
+            }">
+              {{ admin.isactive ? 'Hoạt động' : 'Không hoạt động' }}
+            </span>
+          </td>
+          <td>
+            <button *ngIf="isCurrentUser(admin.id)" class="btn btn-sm" [ngClass]="admin.isactive ? 'btn-danger' : 'btn-success'"
+              (click)="toggleActiveStatus(admin)" [disabled]="isLoading">
+              {{ admin.isactive ? 'Tắt' : 'Bật' }}
+            </button>
+            <button *ngIf="isCurrentUser(admin.id)" style="margin-left: 10px; margin-top: 10px" class="btn btn-primary btn-sm" 
+              (click)="openEditModal(admin)" [disabled]="isLoading">
+              Chỉnh sửa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="admins.length === 0 && !isLoading && !errorMessage" class="text-center text-muted">
+      Không có tài khoản admin nào.
+    </div>
+  </div>
+
+  <!-- Modal để chỉnh sửa admin -->
+  <ng-template #editAdminModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Chỉnh sửa thông tin Admin #{{ selectedAdmin?.id }}</h4>
+      <button type="button" class="btn-close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success text-center">
+      {{ successMessage }}
+    </div>
+    <div class="modal-body">
+      <form #editAdminForm="ngForm" (ngSubmit)="updateAdmin()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Tên</label>
+          <input type="text" class="form-control" id="name" name="name" [(ngModel)]="selectedAdmin!.name" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" [(ngModel)]="selectedAdmin!.email" required>
+        </div>
+        <div class="mb-3">
+          <label for="phonenumber" class="form-label">Số điện thoại</label>
+          <input type="text" class="form-control" id="phonenumber" name="phonenumber" [(ngModel)]="selectedAdmin!.phonenumber" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Mật khẩu</label>
+          <input type="text" class="form-control" id="password" name="password" [(ngModel)]="selectedAdmin!.password" required>
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Địa chỉ</label>
+          <input type="text" class="form-control" id="address" name="address" [(ngModel)]="selectedAdmin!.address">
+        </div>
+        <div class="mb-3">
+          <label for="dateofbirth" class="form-label">Ngày sinh</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            id="dateofbirth" 
+            name="dateofbirth"
+            [value]="dateOfBirthString"
+            (change)="onDateOfBirthChange($any($event.target).value)">
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="!editAdminForm.valid || isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Lưu thay đổi
+        </button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="modal.dismiss('Close click')" [disabled]="isLoading">
+          Hủy
+        </button>
+      </form>
+    </div>
+  </ng-template>
+</div>

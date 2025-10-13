@@ -1,0 +1,17 @@
+.table th, .table td {
+    vertical-align: middle;
+  }
+  
+  .status-active {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .status-inactive {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }

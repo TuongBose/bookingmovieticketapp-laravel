@@ -1,0 +1,131 @@
+
+/* Giới hạn độ rộng container chính */
+.container {
+    max-width: 1200px; /* Tăng độ rộng để chứa nhiều card ngang */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Danh sách booking */
+.booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Khoảng cách giữa các nhóm ngày */
+}
+
+/* Tiêu đề ngày */
+.date-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0;
+}
+
+/* Đường phân cách */
+.date-divider {
+    border: 0;
+    border-top: 2px solid #ccc;
+    margin: 10px 0;
+}
+
+/* Hàng chứa các card booking */
+.booking-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Khoảng cách giữa các card trong cùng một hàng */
+}
+
+/* Card booking */
+.booking-card {
+    flex: 1 1 300px; /* Mỗi card có chiều rộng tối thiểu 300px, co giãn linh hoạt */
+    max-width: 350px; /* Giới hạn chiều rộng tối đa của card */
+}
+
+.booking-card .card {
+    transition: transform 0.2s;
+    width: 100%;
+    height: 100%; /* Đảm bảo card có chiều cao đồng đều */
+}
+
+/* Hiệu ứng hover */
+.booking-card .card:hover {
+    transform: translateY(-5px);
+}
+
+/* Tiêu đề card */
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Văn bản trong card */
+.card-text {
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+/* Định dạng chữ đậm */
+.card-text strong {
+    color: #333;
+}
+
+/* Phần bộ lọc */
+.filter-section {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 1000px; /* Giới hạn độ rộng bộ lọc */
+    margin: 0 auto;
+}
+
+/* Trạng thái active */
+.status-active {
+    color: #28a745; /* Green for active */
+    font-weight: bold;
+}
+
+/* Trạng thái inactive */
+.status-inactive {
+    color: #dc3545; /* Red for inactive */
+    font-weight: bold;
+}
+
+/* Trạng thái thanh toán COMPLETE */
+.payment-completed {
+    color: #28a745; /* Green for COMPLETE */
+    font-weight: bold;
+}
+
+/* Trạng thái thanh toán PENDING */
+.payment-pending {
+    color: #dc3545; /* Red for PENDING */
+    font-weight: bold;
+}
+
+/* Responsive cho màn hình nhỏ */
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .booking-row {
+        flex-direction: column; /* Chuyển thành dọc trên mobile */
+        gap: 15px;
+    }
+
+    .booking-card {
+        flex: 1 1 100%; /* Card chiếm toàn bộ chiều rộng trên mobile */
+        max-width: 100%;
+    }
+
+    .filter-section {
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+    }
+}

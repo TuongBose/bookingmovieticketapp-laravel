@@ -1,0 +1,131 @@
+<!-- src/app/list-movie/list-movie.component.html -->
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Danh sách phim</h3>
+  
+    <!-- Spinner khi đang tải -->
+    <div *ngIf="!nowShowingMovies.length && !comingSoonMovies.length && !errorMessage" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Đang tải...</span>
+      </div>
+    </div>
+  
+    <!-- Thông báo lỗi -->
+    <div *ngIf="errorMessage" class="alert alert-danger text-center">
+      {{ errorMessage }}
+    </div>
+  
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="movieTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          [class.active]="activeTab === 'nowShowing'"
+          (click)="setActiveTab('nowShowing')"
+          id="now-showing-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#now-showing"
+          type="button"
+          role="tab"
+          aria-controls="now-showing"
+          aria-selected="true"
+        >
+          Đang chiếu
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          [class.active]="activeTab === 'comingSoon'"
+          (click)="setActiveTab('comingSoon')"
+          id="coming-soon-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#coming-soon"
+          type="button"
+          role="tab"
+          aria-controls="coming-soon"
+          aria-selected="false"
+        >
+          Sắp chiếu
+        </button>
+      </li>
+    </ul>
+  
+    <!-- Nội dung của tabs -->
+    <div class="tab-content" id="movieTabsContent">
+      <!-- Tab Đang chiếu -->
+      <div
+        class="tab-pane fade"
+        [class.show]="activeTab === 'nowShowing'"
+        [class.active]="activeTab === 'nowShowing'"
+        id="now-showing"
+        role="tabpanel"
+        aria-labelledby="now-showing-tab"
+      >
+        <!-- Danh sách phim dọc -->
+        <div class="movie-list-vertical">
+          <div class="movie-card" *ngFor="let movie of nowShowingMovies">
+            <div class="card shadow-sm d-flex flex-row">
+              <img
+                [src]="movie.posterurl"
+                class="card-img-left"
+                alt="{{ movie.name }}"
+                style="width: 150px; height: 225px; object-fit: cover;"
+              />
+              <div class="card-body">
+                <h5 class="card-title">{{ movie.name }}</h5>
+                <p class="card-text text-muted">
+                  Ngày phát hành: {{ movie.releasedate | date:'dd/MM/yyyy' }}
+                </p>
+                <p class="card-text">
+                  Điểm đánh giá: {{ movie.voteaverage }}/10
+                </p>
+                <a href="#" class="btn btn-primary">Xem chi tiết</a>
+              </div>
+            </div>
+          </div>
+          <!-- Hiển thị thông báo nếu không có phim -->
+          <div *ngIf="!nowShowingMovies.length" class="text-center text-muted">
+            Hiện không có phim nào đang chiếu.
+          </div>
+        </div>
+      </div>
+  
+      <!-- Tab Sắp chiếu -->
+      <div
+        class="tab-pane fade"
+        [class.show]="activeTab === 'comingSoon'"
+        [class.active]="activeTab === 'comingSoon'"
+        id="coming-soon"
+        role="tabpanel"
+        aria-labelledby="coming-soon-tab"
+      >
+        <!-- Danh sách phim dọc -->
+        <div class="movie-list-vertical">
+          <div class="movie-card" *ngFor="let movie of comingSoonMovies">
+            <div class="card shadow-sm d-flex flex-row">
+              <img
+                [src]="movie.posterurl"
+                class="card-img-left"
+                alt="{{ movie.name }}"
+                style="width: 150px; height: 225px; object-fit: cover;"
+              />
+              <div class="card-body">
+                <h5 class="card-title">{{ movie.name }}</h5>
+                <p class="card-text text-muted">
+                  Ngày phát hành: {{ movie.releasedate | date:'dd/MM/yyyy' }}
+                </p>
+                <p class="card-text">
+                  Điểm đánh giá: {{ movie.voteaverage }}/10
+                </p>
+                <a href="#" class="btn btn-primary">Xem chi tiết</a>
+              </div>
+            </div>
+          </div>
+          <!-- Hiển thị thông báo nếu không có phim -->
+          <div *ngIf="!comingSoonMovies.length" class="text-center text-muted">
+            Hiện không có phim nào sắp chiếu.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

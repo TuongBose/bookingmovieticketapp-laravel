@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "382373495851",
+    "project_id": "app-bookingmovie",
+    "storage_bucket": "app-bookingmovie.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382373495851:android:3911b3cd4b418672b1566e",
+        "android_client_info": {
+          "package_name": "com.example.frontendapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2aiCjuJvX6XZ2TgLW8pvldPyjhioW-eQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
