@@ -2,47 +2,49 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    use HasFactory;
+    protected $table = 'users';
+protected $primaryKey = 'id';
+    public $incrementing = true;
+    public $timestamps = false;
     protected $fillable = [
         'name',
         'email',
         'password',
+        'phonenumber',
+        'address',
+        'dateofbirth',
+        'imagename',
+        'createdat',
+        'isactive',
+        'rolename'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    protected $casts = [
+        'isactive' => 'boolean',
+        'rolename' => 'boolean',
+        'dateofbirth' => 'date',
+        'createdat' => 'datetime'
+    ];
+
+    // Ẩn password khi trả JSON
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function bookings()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Booking::class, 'userid');
+    }
+
+    // Một user có thể có nhiều rating phim
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'userid');
     }
 }
