@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TMDBUpComingResource extends JsonResource
+class TMDBSimilarMovieResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,11 +15,7 @@ class TMDBUpComingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'dates' => [
-                'maximum' => $this->dates['maximum'] ?? null,
-                'minimum' => $this->dates['minimum'] ?? null,
-            ],
-            'results' => TMDBUpComingMovieResource::collection(collect($this->results ?? [])),
+            'id' => $this->id ?? null,
         ];
     }
 }

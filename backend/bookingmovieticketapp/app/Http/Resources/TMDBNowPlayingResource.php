@@ -14,6 +14,12 @@ class TMDBNowPlayingResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'dates' => [
+                'maximum' => $this->dates['maximum'] ?? null,
+                'minimum' => $this->dates['minimum'] ?? null,
+            ],
+            'results' => TMDBMovieResource::collection(collect($this->results ?? [])),
+        ];
     }
 }

@@ -14,6 +14,12 @@ class RoomResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'cinemaId' => $this->cinemaid ?? $this->cinema_id,
+            'name' => $this->name,
+            'seatcolumnmax' => $this->seatcolumnmax,
+            'seatrowmax' => $this->seatrowmax,
+        ];
     }
 }

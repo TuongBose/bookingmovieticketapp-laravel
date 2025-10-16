@@ -14,6 +14,10 @@ class CastResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'movieId' => $this->movieid ?? $this->movie_id,
+            'actorname' => $this->actorname,
+        ];
     }
 }

@@ -14,6 +14,14 @@ class ShowTimeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'movieId' => $this->movieid ?? $this->movie_id,
+            'roomId' => $this->roomid ?? $this->room_id,
+            'showdate' => $this->showdate,
+            'starttime' => $this->starttime,
+            'price' => $this->price,
+            'isactive' => (bool) $this->isactive,
+        ];
     }
 }
