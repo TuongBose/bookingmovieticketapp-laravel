@@ -26,8 +26,7 @@ class BookingService implements IBookingService
         IBookingRepository $bookingRepository,
         IShowTimeRepository $showTimeRepository,
         IUserRepository $userRepository
-        )
-    {
+    ) {
         $this->bookingRepository = $bookingRepository;
         $this->showTimeRepository = $showTimeRepository;
         $this->userRepository = $userRepository;
@@ -69,111 +68,129 @@ class BookingService implements IBookingService
     {
         $showTime = ShowTime::findOrFail($id);
         $bookings = Booking::where('showtimeid', $showTime->id)->get();
-        return BookingResource::collection( $bookings );
+        return BookingResource::collection($bookings);
     }
 
-    // public function getBookingByUserId(int $id)
-    // {
-    //     $user = User::findOrFail($id);
-    //     return Booking::where('userid', $user->id)->get();
-    // }
+    public function getBookingByUserId(int $id)
+    {
+        $user = User::findOrFail($id);
+        $bookings = Booking::where('userid', $user->id)->get();
+        return BookingResource::collection($bookings);
 
-    // public function getAllBooking()
-    // {
-    //     return Booking::all();
-    // }
+    }
 
-    // public function getBookingById(int $id)
-    // {
-    //     return Booking::findOrFail($id);
-    // }
+    public function getAllBooking()
+    {
+        $bookings = Booking::all();
+        return BookingResource::collection($bookings);
+    }
 
-    // public function updateBooking(int $id, BookingRequest $bookingRequest)
-    // {
-    //     $booking = Booking::findOrFail($id);
-    //     $booking->update([
-    //         'userid' => $bookingRequest->userid,
-    //         'showtimeid' => $bookingRequest->showtimeid,
-    //         'totalprice' => $bookingRequest->totalprice,
-    //         'paymentmethod' => $bookingRequest->paymentmethod,
-    //         'paymentstatus' => $bookingRequest->paymentstatus,
-    //     ]);
-    //     return $booking;
-    // }
+    public function getBookingById(int $id)
+    {
+        return Booking::findOrFail($id);
+    }
 
-    // public function deleteBooking(int $id)
-    // {
-    //     $booking = Booking::findOrFail($id);
-    //     $booking->update(['isactive' => false]);
-    // }
+    public function updateBooking(int $id, BookingRequest $bookingRequest)
+    {
+        $booking = Booking::findOrFail($id);
+        $user = User::findOrFail($bookingRequest->userid);
+        $showTime = ShowTime::findOrFail($bookingRequest->showtimeid);
 
-    // public function sumTotalPriceByUserId(int $userId)
-    // {
-    //     return Booking::where('userid', $userId)
-    //         ->whereYear('bookingdate', Carbon::now()->year)
-    //         ->sum('totalprice');
-    // }
+        $booking->update([
+            'userid' => $user->id,
+            'showtimeid' => $showTime->id,
+            'totalprice' => $bookingRequest->totalprice,
+            'paymentmethod' => $bookingRequest->paymentmethod,
+            'paymentstatus' => $bookingRequest->paymentstatus,
+        ]);
+        return $booking;
+    }
 
-    // public function getMostBookedMovie(int $month, int $year)
-    // {
-    //     return DB::table('bookings')
-    //         ->join('showtimes', 'bookings.showtimeid', '=', 'showtimes.id')
-    //         ->join('movies', 'showtimes.movieid', '=', 'movies.id')
-    //         ->select('movies.id as movieId', 'movies.name as movieName', DB::raw('COUNT(bookings.id) as totalBookings'))
-    //         ->whereMonth('bookings.bookingdate', $month)
-    //         ->whereYear('bookings.bookingdate', $year)
-    //         ->groupBy('movies.id', 'movies.name')
-    //         ->orderByDesc('totalBookings')
-    //         ->first();
-    // }
+    public function deleteBooking(int $id)
+    {
+        $booking = Booking::findOrFail($id);
+        $booking->update(['isactive' => false]);
+    }
 
-    // public function calculateMonthlyRevenue(int $month, int $year)
-    // {
-    //     return DB::table('bookings')
-    //         ->whereMonth('bookingdate', $month)
-    //         ->whereYear('bookingdate', $year)
-    //         ->sum('totalprice');
-    // }
+    public function sumTotalPriceByUserId(int $userId)
+    {
+        return Booking::where('userid', $userId)
+            ->whereYear('bookingdate', Carbon::now()->year)
+            ->sum('totalprice');
+    }
 
-    // public function getMostBookedCinema(int $month, int $year)
-    // {
-    //     return DB::table('bookings')
-    //         ->join('showtimes', 'bookings.showtimeid', '=', 'showtimes.id')
-    //         ->join('rooms', 'showtimes.roomid', '=', 'rooms.id')
-    //         ->join('cinemas', 'rooms.cinemaid', '=', 'cinemas.id')
-    //         ->select('cinemas.id as cinemaId', 'cinemas.name as cinemaName', DB::raw('COUNT(bookings.id) as totalBookings'))
-    //         ->whereMonth('bookings.bookingdate', $month)
-    //         ->whereYear('bookings.bookingdate', $year)
-    //         ->groupBy('cinemas.id', 'cinemas.name')
-    //         ->orderByDesc('totalBookings')
-    //         ->first();
-    // }
+    public function getMostBookedMovie(int $month, int $year)
+    {
+        return DB::table('bookings')
+            ->join('showtimes', 'bookings.showtimeid', '=', 'showtimes.id')
+            ->join('movies', 'showtimes.movieid', '=', 'movies.id')
+            ->select('movies.id as movieId', 'movies.name as movieName', DB::raw('COUNT(bookings.id) as totalBookings'))
+            ->whereMonth('bookings.bookingdate', $month)
+            ->whereYear('bookings.bookingdate', $year)
+            ->groupBy('movies.id', 'movies.name')
+            ->orderByDesc('totalBookings')
+            ->first();
+    }
 
-    // public function getSecondMostBookedMovie(int $month, int $year)
-    // {
-    //     return DB::table('bookings')
-    //         ->join('showtimes', 'bookings.showtimeid', '=', 'showtimes.id')
-    //         ->join('movies', 'showtimes.movieid', '=', 'movies.id')
-    //         ->select('movies.id as movieId', 'movies.name as movieName', DB::raw('COUNT(bookings.id) as totalBookings'))
-    //         ->whereMonth('bookings.bookingdate', $month)
-    //         ->whereYear('bookings.bookingdate', $year)
-    //         ->groupBy('movies.id', 'movies.name')
-    //         ->orderByDesc('totalBookings')
-    //         ->skip(1)->take(1)
-    //         ->first();
-    // }
+    public function calculateMonthlyRevenue(int $month, int $year)
+    {
+        $startDate = Carbon::create($year, $month, 1, 0, 0, 0);
+        $endDate = $startDate->copy()->endOfMonth();
 
-    // public function getThirdMostBookedMovie(int $month, int $year)
-    // {
-    //     return DB::table('bookings')
-    //         ->join('showtimes', 'bookings.showtimeid', '=', 'showtimes.id')
-    //         ->join('movies', 'showtimes.movieid', '=', 'movies.id')
-    //         ->select('movies.id as movieId', 'movies.name as movieName', DB::raw('COUNT(bookings.id) as totalBookings'))
-    //         ->whereMonth('bookings.bookingdate', $month)
-    //         ->whereYear('bookings.bookingdate', $year)
-    //         ->groupBy('movies.id', 'movies.name')
-    //         ->orderByDesc('totalBookings')
-    //         ->skip(2)->take(1)
-    //         ->first();
-    // }
+        return $this->bookingRepository->calculateTotalRevenue($startDate, $endDate);
+    }
+
+    public function getMostBookedCinema(int $month, int $year)
+    {
+        $startDate = Carbon::create($year, $month, 1)->startOfDay();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        $result = $this->bookingRepository->findMostBookedCinema($startDate, $endDate);
+
+        if (empty($result)) {
+            return [];
+        }
+
+        return [
+            'cinemaId' => $result[0]->id,
+            'cinemaName' => $result[0]->name,
+            'totalBookings' => $result[0]->total_bookings,
+        ];
+    }
+
+    public function getSecondMostBookedMovie(int $month, int $year)
+    {
+        $startDate = Carbon::create($year, $month, 1)->startOfDay();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        $result = $this->bookingRepository->findSecondMostBookedMovie($startDate, $endDate);
+
+        if (empty($result)) {
+            return [];
+        }
+
+        return [
+            'movieId' => $result[0]->id,
+            'movieName' => $result[0]->name,
+            'totalBookings' => $result[0]->total_bookings,
+        ];
+    }
+
+    public function getThirdMostBookedMovie(int $month, int $year)
+    {
+        $startDate = Carbon::create($year, $month, 1)->startOfDay();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        $result = $this->bookingRepository->findThirdMostBookedMovie($startDate, $endDate);
+
+        if (empty($result)) {
+            return [];
+        }
+
+        return [
+            'movieId' => $result[0]->id,
+            'movieName' => $result[0]->name,
+            'totalBookings' => $result[0]->total_bookings,
+        ];
+    }
 }
