@@ -19,7 +19,7 @@ class TMDBUpComingResource extends JsonResource
                 'maximum' => $this->dates['maximum'] ?? null,
                 'minimum' => $this->dates['minimum'] ?? null,
             ],
-            'results' => TMDBUpComingMovieResource::collection(collect($this->results ?? [])),
+            'results' => TMDBMovieResource::collection(collect($this->results ?? [])),
         ];
     }
 }
