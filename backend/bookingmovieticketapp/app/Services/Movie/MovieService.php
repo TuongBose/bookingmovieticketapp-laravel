@@ -3,8 +3,7 @@
 namespace App\Services\Movie;
 
 use App\Http\Resources\TMDBMovieResource;
-use App\Http\Resources\TMDBNowPlayingResource;
-use App\Http\Resources\TMDBUpComingResource;
+use App\Models\Cast;
 use App\Models\Movie;
 use App\Repositories\Cast\ICastRepository;
 use App\Repositories\Movie\IMovieRepository;
@@ -29,17 +28,52 @@ class MovieService implements IMovieService
         $this->castRepository = $castRepository;
         $this->apiKey = env('TMDB_API_KEY');
 
+        $this->onInit();
+    }
+
+    private function onInit(){
         $this->syncMoviesFromTMDB();
         $this->generateCastsForMovie();
     }
 
     private function getNowPlayingMovies()
     {
-        $url = "https://api.themoviedb.org/3/movie/now_playing?api_key={$this->apiKey}&language=vi-VN&page=1";
+        try {
+            $url = "https://api.themoviedb.org/3/movie/now_playing?api_key={$this->apiKey}&language=vi-VN&page=1";
+            $response = Http::get($url);
+
+            if (!$response->successful()) {
+                Log::warning("Không thể lấy danh sách phim đang chiếu từ TMDB. URL: {$url}");
+                return null;
+            }
+
+            $data = $response->json();
+            Log::info("Đã lấy danh sách phim đang chiếu từ TMDB (" . count($data['results'] ?? []) . " phim)");
+            return $data; 
+        } catch (Exception $e) {
+            Log::error("Lỗi khi gọi TMDB API (NowPlaying): " . $e->getMessage());
+            return null;
+        }
     }
 
     private function getUpComingMovies()
     {
+        try {
+            $url = "https://api.themoviedb.org/3/movie/upcoming?api_key={$this->apiKey}&language=vi-VN&page=1";
+            $response = Http::get($url);
+
+            if (!$response->successful()) {
+                Log::warning("Không thể lấy danh sách phim sap chiếu từ TMDB. URL: {$url}");
+                return null;
+            }
+
+            $data = $response->json();
+            Log::info("Đã lấy danh sách phim sap chiếu từ TMDB (" . count($data['results'] ?? []) . " phim)");
+            return $data; 
+        } catch (Exception $e) {
+            Log::error("Lỗi khi gọi TMDB API (UpComing): " . $e->getMessage());
+            return null;
+        }
     }
 
     private function getAgeCertification(int $movieId)
@@ -186,18 +220,15 @@ class MovieService implements IMovieService
                 return [];
             }
 
-            $casts = [];
-            foreach ($castList as $index => $cast) {
-                if ($index >= 5)
-                    break; // chỉ lấy tối đa 5 diễn viên
-                $actorName = $cast['name'] ?? null;
-                if (empty($actorName))
-                    continue;
-
-                $casts[] = [
-                    'actorname' => $actorName
-                ];
-            }
+            $casts = collect($castList)
+                ->take(5) // chỉ lấy tối đa 5 diễn viên
+                ->filter(fn($c) => !empty($c['name']))
+                ->map(fn($c) => [
+                    'movieid' => $movieId,
+                    'actorname' => $c['name']
+                ])
+                ->values()
+                ->toArray();
 
             return $casts;
         } catch (Exception $e) {
@@ -206,30 +237,61 @@ class MovieService implements IMovieService
         }
     }
 
+    private function generateCastsForMovie()
+    {
+        $movieList = Movie::all();
+        Log::info("Tìm thấy " . count($movieList) . " phim để xử lý cast.");
+
+        foreach ($movieList as $movie) {
+            Log::debug("Đang xử lý phim: {$movie->name} (ID: {$movie->id})");
+
+            $existingCasts = $this->castRepository->findByMovieId($movie->id);
+            if (!empty($existingCasts)) {
+                Log::debug("Phim {$movie->name} (ID: {$movie->id}) đã có cast, bỏ qua.");
+                continue;
+            }
+
+            $castList = $this->getCasts($movie->id);
+            foreach ($castList as $castData) {
+                $cast = new Cast();
+                $cast->movieid = $movie->id;
+                $cast->actorname = $castData['actorname'];
+                $cast->save();
+
+                Log::info("Đã lưu cast cho phim {$movie->name} (Diễn viên: {$castData['actorname']})");
+            }
+        }
+    }
+
+
     public function getNowPlaying()
     {
-        $url = "https://api.themoviedb.org/3/movie/now_playing?api_key={$this->apiKey}&language=vi-VN&page=1";
-        $response = Http::get($url);
+        $response = $this->getNowPlayingMovies();
 
-        if (!$response->successful()) {
-            Log::warning("Không thể lấy dữ liệu phim đang chiếu từ TMDB.");
+        if (empty($response) || empty($response['results'])) {
+            Log::warning("Không có dữ liệu phim đang chiếu từ TMDB.");
             return [];
         }
 
-        $data = $response->json();
         $movies = [];
 
-        foreach ($data['results'] ?? [] as $tmdbMovie) {
+        foreach ($response['results'] as $tmdbMovie) {
             $movies[] = [
                 'id' => $tmdbMovie['id'],
                 'name' => $tmdbMovie['title'],
-                'description' => $tmdbMovie['overview'] ?: 'Chưa có thông tin',
+                'description' => !empty($tmdbMovie['overview']) ? $tmdbMovie['overview'] : 'Chưa có thông tin',
                 'duration' => $this->getMovieRunTime($tmdbMovie['id']),
-                'releasedate' => Carbon::parse($tmdbMovie['release_date']),
-                'posterurl' => "https://image.tmdb.org/t/p/w500" . $tmdbMovie['poster_path'],
-                'bannerurl' => "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path'],
+                'releasedate' => !empty($tmdbMovie['release_date'])
+                    ? Carbon::parse($tmdbMovie['release_date'])
+                    : null,
+                'posterurl' => !empty($tmdbMovie['poster_path'])
+                    ? "https://image.tmdb.org/t/p/w500" . $tmdbMovie['poster_path']
+                    : null,
+                'bannerurl' => !empty($tmdbMovie['backdrop_path'])
+                    ? "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path']
+                    : null,
                 'agerating' => $this->getAgeCertification($tmdbMovie['id']),
-                'voteaverage' => $tmdbMovie['vote_average'],
+                'voteaverage' => $tmdbMovie['vote_average'] ?? 0,
                 'director' => $this->getDirector($tmdbMovie['id']),
             ];
         }
@@ -239,28 +301,32 @@ class MovieService implements IMovieService
 
     public function getUpComing()
     {
-        $url = "https://api.themoviedb.org/3/movie/upcoming?api_key={$this->apiKey}&language=vi-VN&page=1";
-        $response = Http::get($url);
+        $response = $this->getUpComingMovies();
 
-        if (!$response->successful()) {
-            Log::warning("Không thể lấy dữ liệu phim sắp chiếu từ TMDB.");
+        if (empty($response) || empty($response['results'])) {
+            Log::warning("Không có dữ liệu phim sap chiếu từ TMDB.");
             return [];
         }
 
-        $data = $response->json();
         $movies = [];
 
-        foreach ($data['results'] ?? [] as $tmdbMovie) {
+        foreach ($response['results'] as $tmdbMovie) {
             $movies[] = [
                 'id' => $tmdbMovie['id'],
                 'name' => $tmdbMovie['title'],
-                'description' => $tmdbMovie['overview'] ?: 'Chưa có thông tin',
+                'description' => !empty($tmdbMovie['overview']) ? $tmdbMovie['overview'] : 'Chưa có thông tin',
                 'duration' => $this->getMovieRunTime($tmdbMovie['id']),
-                'releasedate' => Carbon::parse($tmdbMovie['release_date']),
-                'posterurl' => "https://image.tmdb.org/t/p/w500" . $tmdbMovie['poster_path'],
-                'bannerurl' => "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path'],
+                'releasedate' => !empty($tmdbMovie['release_date'])
+                    ? Carbon::parse($tmdbMovie['release_date'])
+                    : null,
+                'posterurl' => !empty($tmdbMovie['poster_path'])
+                    ? "https://image.tmdb.org/t/p/w500" . $tmdbMovie['poster_path']
+                    : null,
+                'bannerurl' => !empty($tmdbMovie['backdrop_path'])
+                    ? "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path']
+                    : null,
                 'agerating' => $this->getAgeCertification($tmdbMovie['id']),
-                'voteaverage' => $tmdbMovie['vote_average'],
+                'voteaverage' => $tmdbMovie['vote_average'] ?? 0,
                 'director' => $this->getDirector($tmdbMovie['id']),
             ];
         }
