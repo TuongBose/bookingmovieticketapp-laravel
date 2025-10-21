@@ -2,63 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RoomRequest;
+use App\Services\Room\IRoomService;
+use App\Services\Seat\ISeatService;
+use Exception;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $roomService;
+    protected $seatService;
+
+    public function __construct(IRoomService $roomService, ISeatService $seatService)
     {
-        //
+        $this->roomService = $roomService;
+        $this->seatService = $seatService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getRoomById(int $id)
     {
-        //
+        try {
+            $room = $this->roomService->getRoomById($id);
+            return response()->json($room);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getSeatsByRoomId(int $roomId)
     {
-        //
+        try {
+            $seats = $this->seatService->getSeatByRoomId($roomId);
+            return response()->json($seats);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function getAllRooms()
     {
-        //
+        try {
+            $rooms = $this->roomService->getAllRooms();
+            return response()->json($rooms);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function createRoom(RoomRequest $request)
     {
-        //
+        try {
+            $room = $this->roomService->createRoom($request);
+            return response()->json($room);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function updateRoom(int $id, RoomRequest $request)
     {
-        //
+        try {
+            $room = $this->roomService->updateRoom($id, $request);
+            return response()->json($room);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function deleteRoom(int $id)
     {
-        //
+        try {
+            $this->roomService->deleteRoom($id);
+            return response()->json(['message' => 'Xóa phòng thành công.']);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function getRoomsByCinemaId(int $cinemaId)
+    {
+        try {
+            $rooms = $this->roomService->getRoomByCinemaId($cinemaId);
+            return response()->json($rooms);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

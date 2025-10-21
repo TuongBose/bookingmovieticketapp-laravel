@@ -2,63 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Seat\ISeatService;
+use Exception;
 use Illuminate\Http\Request;
 
 class SeatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $seatService;
+
+    public function __construct(ISeatService $seatService)
     {
-        //
+        $this->seatService = $seatService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getSeatByRoomId(Request $request)
     {
-        //
+        try {
+            $roomId = $request->query('roomId');
+            if (!$roomId) {
+                return response()->json(['error' => 'Thiếu tham số roomId.'], 400);
+            }
+
+            $seats = $this->seatService->getSeatByRoomId($roomId);
+            return response()->json($seats);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getSeatById(int $id)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        try {
+            $seat = $this->seatService->getSeatById($id);
+            return response()->json($seat);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

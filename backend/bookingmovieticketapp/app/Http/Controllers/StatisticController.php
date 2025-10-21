@@ -2,63 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Booking\IBookingService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class StatisticController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $bookingService;
+
+    public function __construct(IBookingService $bookingService)
     {
-        //
+        $this->bookingService = $bookingService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getMonthlyStatistics()
     {
-        //
-    }
+        try {
+            $now = Carbon::now();
+            $month = $now->month;
+            $year = $now->year;
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+            $statistics = [
+                'mostBookedMovie'        => $this->bookingService->getMostBookedMovie($month, $year),
+                'secondMostBookedMovie'  => $this->bookingService->getSecondMostBookedMovie($month, $year),
+                'thirdMostBookedMovie'   => $this->bookingService->getThirdMostBookedMovie($month, $year),
+                'totalRevenue'           => $this->bookingService->calculateMonthlyRevenue($month, $year),
+                'mostBookedCinema'       => $this->bookingService->getMostBookedCinema($month, $year),
+            ];
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            return response()->json($statistics);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

@@ -12,4 +12,5 @@ interface IShowTimeService
     public function updateShowTimeStatus(int $id, bool $isActive);
     public function getBookingsCountForShowTime(int $showTimeId);
     public function createShowTime(ShowtimeRequest $showtimeRequest);
+    public function getShowtimesByCinemaIdAndDate(int $cinemaId, Carbon $showDate);
 }

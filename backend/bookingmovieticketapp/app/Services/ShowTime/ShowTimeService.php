@@ -165,4 +165,10 @@ class ShowTimeService implements IShowTimeService
         Log::info("📅 Đã tạo suất chiếu mới cho phim {$movie->name} tại phòng {$room->name}");
         return $showtime;
     }
+
+    public function getShowtimesByCinemaIdAndDate(int $cinemaId, Carbon $showDate){
+        $showtimes = $this->showTimeRepository->findByCinemaIdAndShowdate($cinemaId,$showDate);
+        return ShowTimeResource::collection($showtimes);
+    }
+
 }
