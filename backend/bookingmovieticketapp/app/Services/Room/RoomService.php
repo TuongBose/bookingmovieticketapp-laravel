@@ -61,7 +61,7 @@ class RoomService implements IRoomService
                 'seatrowmax' => $seatRowMax,
             ]);
 
-            Log::info("🎬 Tạo phòng {$roomName} cho rạp {$cinema->name} (ID: {$cinema->id})");
+            Log::info("Tạo phòng {$roomName} cho rạp {$cinema->name} (ID: {$cinema->id})");
         }
     }
 

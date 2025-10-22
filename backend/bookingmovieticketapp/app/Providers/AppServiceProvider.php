@@ -26,6 +26,7 @@ use App\Services\BookingDetail\BookingDetailService;
 use App\Services\BookingDetail\IBookingDetailService;
 use App\Services\Cast\CastService;
 use App\Services\Cast\ICastService;
+use App\Services\InitService;
 use App\Services\Cinema\CinemaService;
 use App\Services\Cinema\ICinemaService;
 use App\Services\Movie\IMovieService;
@@ -38,6 +39,7 @@ use App\Services\ShowTime\IShowTimeService;
 use App\Services\ShowTime\ShowTimeService;
 use App\Services\User\IUserService;
 use App\Services\User\UserService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -73,8 +75,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(MovieService $movieService): void
     {
-        //
+        // try {
+        //     Log::info('Khởi động MovieService onInit()...');
+        //     $initService->onInit(); // gọi hàm onInit()
+        // } catch (\Exception $e) {
+        //     Log::error('Lỗi khi chạy onInit MovieService: ' . $e->getMessage());
+        // }
     }
 }

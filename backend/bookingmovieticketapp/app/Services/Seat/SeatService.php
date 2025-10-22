@@ -44,7 +44,7 @@ class SeatService implements ISeatService
 
         $existingSeats = $this->seatRepository->findByRoom($room);
         if (count($existingSeats) > 0) {
-            Log::info("✅ Phòng {$room->name} (ID: {$room->id}) đã có danh sách ghế.");
+            Log::info("Phòng {$room->name} (ID: {$room->id}) đã có danh sách ghế.");
             return;
         }
 
@@ -64,7 +64,7 @@ class SeatService implements ISeatService
                     'roomid' => $roomId,
                     'seatnumber' => $seatNumber,
                 ]);
-                Log::info("🎫 Đã tạo ghế {$seatNumber} cho phòng {$room->name} (ID: {$room->id})");
+                Log::info("Đã tạo ghế {$seatNumber} cho phòng {$room->name} (ID: {$room->id})");
             }
         }
     }

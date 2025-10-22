@@ -26,18 +26,18 @@ class Movie extends Model
         'director'
     ];
 
-    public function showtimes()
-    {
-        return $this->hasMany(Showtime::class, 'movieid');
-    }
+    // public function showtimes()
+    // {
+    //     return $this->hasMany(Showtime::class, 'movieid');
+    // }
 
-    public function ratings()
-    {
-        return $this->hasMany(Rating::class, 'movieid');
-    }
+    // public function ratings()
+    // {
+    //     return $this->hasMany(Rating::class, 'movieid');
+    // }
 
-    public function casts()
-    {
-        return $this->hasMany(Cast::class, 'movieid');
-    }
+    // public function casts()
+    // {
+    //     return $this->hasMany(Cast::class, 'movieid');
+    // }
 }

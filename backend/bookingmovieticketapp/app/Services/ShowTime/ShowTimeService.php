@@ -25,6 +25,7 @@ class ShowTimeService implements IShowTimeService
     protected $movieRepository;
     protected $bookingRepository;
     protected $bookingDetailRepository;
+    protected static $hasInitialized = false;
     /**
      * Create a new class instance.
      */
@@ -43,7 +44,10 @@ class ShowTimeService implements IShowTimeService
         $this->bookingRepository = $bookingRepository;
         $this->bookingDetailRepository = $bookingDetailRepository;
 
-        $this->generateShowtimesForAllRooms();
+        if (!self::$hasInitialized) {
+            $this->generateShowtimesForAllRooms();
+            self::$hasInitialized = true;
+        }
     }
 
     private function generateShowtimesForAllRooms()
@@ -78,7 +82,7 @@ class ShowTimeService implements IShowTimeService
                     $isAvailable = true;
 
                     foreach ($existingShowtimes as $existing) {
-                        $existingMovie = Movie::findOrFail($existing->movieid);
+                        $existingMovie = Movie::find($existing->movieid);
                         $duration = $existingMovie?->duration ?? 120;
                         $existingStart = Carbon::parse($existing->starttime);
                         $existingEnd = $existingStart->copy()->addMinutes($duration);
@@ -166,8 +170,9 @@ class ShowTimeService implements IShowTimeService
         return $showtime;
     }
 
-    public function getShowtimesByCinemaIdAndDate(int $cinemaId, Carbon $showDate){
-        $showtimes = $this->showTimeRepository->findByCinemaIdAndShowdate($cinemaId,$showDate);
+    public function getShowtimesByCinemaIdAndDate(int $cinemaId, Carbon $showDate)
+    {
+        $showtimes = $this->showTimeRepository->findByCinemaIdAndShowdate($cinemaId, $showDate);
         return ShowTimeResource::collection($showtimes);
     }
 

@@ -17,6 +17,7 @@ class MovieService implements IMovieService
     protected $movieRepository;
     protected $castRepository;
     protected $apiKey;
+    protected static $hasInitialized = false;
     /**
      * Create a new class instance.
      */
@@ -28,10 +29,14 @@ class MovieService implements IMovieService
         $this->castRepository = $castRepository;
         $this->apiKey = env('TMDB_API_KEY');
 
-        $this->onInit();
+        if (!self::$hasInitialized) {
+            $this->onInit();
+            self::$hasInitialized = true;
+        }
     }
 
-    private function onInit(){
+    private function onInit()
+    {
         $this->syncMoviesFromTMDB();
         $this->generateCastsForMovie();
     }
@@ -49,7 +54,7 @@ class MovieService implements IMovieService
 
             $data = $response->json();
             Log::info("Đã lấy danh sách phim đang chiếu từ TMDB (" . count($data['results'] ?? []) . " phim)");
-            return $data; 
+            return $data;
         } catch (Exception $e) {
             Log::error("Lỗi khi gọi TMDB API (NowPlaying): " . $e->getMessage());
             return null;
@@ -69,7 +74,7 @@ class MovieService implements IMovieService
 
             $data = $response->json();
             Log::info("Đã lấy danh sách phim sap chiếu từ TMDB (" . count($data['results'] ?? []) . " phim)");
-            return $data; 
+            return $data;
         } catch (Exception $e) {
             Log::error("Lỗi khi gọi TMDB API (UpComing): " . $e->getMessage());
             return null;
@@ -156,7 +161,7 @@ class MovieService implements IMovieService
         if (!$movieId)
             return;
 
-        $existingMovie = Movie::findOrFail($movieId);
+        $existingMovie = Movie::find($movieId);
         if ($existingMovie) {
             Log::debug("Phim {$tmdbMovie->title} đã tồn tại, bỏ qua.");
             return;
@@ -187,6 +192,7 @@ class MovieService implements IMovieService
 
         foreach ($nowPlayingMovies as $tmdbMovieData) {
             $tmdbMovie = new TMDBMovieResource((object) $tmdbMovieData);
+            Log::info('TMDB movie fetched', ['movie' => $tmdbMovie->resolve()]);
             $this->saveTMDBMovie($tmdbMovie, 'Đang chiếu');
         }
 
