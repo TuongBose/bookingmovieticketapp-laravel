@@ -75,13 +75,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(MovieService $movieService): void
+    public function boot(): void
     {
-        // try {
-        //     Log::info('Khởi động MovieService onInit()...');
-        //     $initService->onInit(); // gọi hàm onInit()
-        // } catch (\Exception $e) {
-        //     Log::error('Lỗi khi chạy onInit MovieService: ' . $e->getMessage());
-        // }
     }
 }

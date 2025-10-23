@@ -37,6 +37,10 @@ WORKDIR /var/www/html/bookingmovieticketapp
 # Copy toàn bộ code Laravel
 COPY . .
 
+# Copy script khởi động
+COPY docker-start.sh /usr/local/bin/docker-start.sh
+RUN chmod +x /usr/local/bin/docker-start.sh
+
 # Set quyền cho storage và bootstrap/cache (Laravel yêu cầu)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
@@ -44,8 +48,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 8000
 
 # Khi container khởi động thì tự chạy php artisan serve
-CMD bash -c "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080"
-
+CMD ["/usr/local/bin/docker-start.sh"]
 
 
 
