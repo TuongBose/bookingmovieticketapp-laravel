@@ -25,7 +25,6 @@ class ShowTimeService implements IShowTimeService
     protected $movieRepository;
     protected $bookingRepository;
     protected $bookingDetailRepository;
-    protected static $hasInitialized = false;
     /**
      * Create a new class instance.
      */
@@ -43,18 +42,12 @@ class ShowTimeService implements IShowTimeService
         $this->movieRepository = $movieRepository;
         $this->bookingRepository = $bookingRepository;
         $this->bookingDetailRepository = $bookingDetailRepository;
-
-        if (!self::$hasInitialized) {
-            $this->generateShowtimesForAllRooms();
-            self::$hasInitialized = true;
-        }
     }
 
-    private function generateShowtimesForAllRooms()
+    public function generateShowtimesForAllRooms()
     {
         $rooms = Room::all();
         $movies = Movie::all();
-        $random = random_int(1, 10000);
 
         if ($rooms->isEmpty() || $movies->isEmpty()) {
             Log::info("Không có phim hoặc phòng nào để tạo lịch chiếu.");
@@ -89,6 +82,7 @@ class ShowTimeService implements IShowTimeService
 
                         if ($startTime->between($existingStart, $existingEnd)) {
                             $isAvailable = false;
+                            Log::info("Showtime đã tồn tại: Phim '{$existingMovie?->name}' tại phòng {$room->name} từ {$existingStart->format('H:i')} đến {$existingEnd->format('H:i')} ({$date->toDateString()})");
                             break;
                         }
                     }
@@ -110,7 +104,7 @@ class ShowTimeService implements IShowTimeService
                         'isactive' => true,
                     ]);
 
-                    Log::info("🎬 Đã tạo lịch chiếu phim {$movie->name} tại phòng {$room->name} ({$startTime}).");
+                    Log::info("Đã tạo lịch chiếu phim {$movie->name} tại phòng {$room->name} ({$startTime}).");
                 }
             }
         }

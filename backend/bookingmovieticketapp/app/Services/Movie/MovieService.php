@@ -17,7 +17,6 @@ class MovieService implements IMovieService
     protected $movieRepository;
     protected $castRepository;
     protected $apiKey;
-    protected static $hasInitialized = false;
     /**
      * Create a new class instance.
      */
@@ -28,14 +27,9 @@ class MovieService implements IMovieService
         $this->movieRepository = $movieRepository;
         $this->castRepository = $castRepository;
         $this->apiKey = env('TMDB_API_KEY');
-
-        if (!self::$hasInitialized) {
-            $this->onInit();
-            self::$hasInitialized = true;
-        }
     }
 
-    private function onInit()
+    public function onInit()
     {
         $this->syncMoviesFromTMDB();
         $this->generateCastsForMovie();
@@ -192,7 +186,6 @@ class MovieService implements IMovieService
 
         foreach ($nowPlayingMovies as $tmdbMovieData) {
             $tmdbMovie = new TMDBMovieResource((object) $tmdbMovieData);
-            Log::info('TMDB movie fetched', ['movie' => $tmdbMovie->resolve()]);
             $this->saveTMDBMovie($tmdbMovie, 'Đang chiếu');
         }
 

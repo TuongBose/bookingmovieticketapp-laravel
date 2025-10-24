@@ -24,11 +24,9 @@ class SeatService implements ISeatService
     ) {
         $this->roomRepository = $roomRepository;
         $this->seatRepository = $seatRepository;
-
-        $this->generateSeatsForAllRooms();
     }
 
-    private function generateSeatsForAllRooms()
+    public function generateSeatsForAllRooms()
     {
         $rooms = Room::all();
         foreach ($rooms as $room) {

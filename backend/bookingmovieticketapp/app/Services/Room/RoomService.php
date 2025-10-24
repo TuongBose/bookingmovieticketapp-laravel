@@ -23,11 +23,9 @@ class RoomService implements IRoomService
     ) {
         $this->cinemaRepository = $cinemaRepository;
         $this->roomRepository = $roomRepository;
-
-        $this->generateRoomsForAllCinemas();
     }
 
-    private function generateRoomsForAllCinemas()
+    public function generateRoomsForAllCinemas()
     {
         $cinemas = Cinema::all();
         foreach ($cinemas as $cinema) {
@@ -44,7 +42,6 @@ class RoomService implements IRoomService
             return;
         }
 
-        $random = rand(1, 999999);
         for ($i = 1; $i <= $maxRooms; $i++) {
             $roomName = "RAP {$i}";
             if (collect($existingRooms)->contains(fn($r) => $r->name === $roomName)) {
