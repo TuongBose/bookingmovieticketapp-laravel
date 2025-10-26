@@ -37,8 +37,9 @@ export class LoginComponent {
         this.router.navigate(['/home']);
       },
       error: (error: any) => {
+        debugger
         console.error('Login failed:', error);
-        if (error.status === 403) {
+        if (error.status === 400) {
           this.errorMessage = 'Truy cập bị từ chối. Vui lòng kiểm tra thông tin đăng nhập.';
         } else {
           this.errorMessage = error.error || 'Đăng nhập thất bại. Vui lòng thử lại.';
