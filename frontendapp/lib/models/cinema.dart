@@ -30,6 +30,6 @@ class Cinema {
     phoneNumber: json['phonenumber'],
     maxRoom: json['maxroom'],
     imageName: json['imagename'],
-    isActive: json['isactive'],
+    isActive: json['isactive'] == 1,
   );
 }

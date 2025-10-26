@@ -64,7 +64,7 @@ export class ShowTimeService {
             headers: headers,
             withCredentials: true,
         }).pipe(
-            timeout(5000),
+            timeout(500000),
             retry(1),
             catchError(this.handleError)
         );

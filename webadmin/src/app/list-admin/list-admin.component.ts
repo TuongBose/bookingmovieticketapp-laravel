@@ -167,7 +167,7 @@ export class ListAdminComponent implements OnInit {
         console.log('API response:', response);
         this.isLoading = false;
         this.successMessage = 'Cập nhật thông tin admin thành công!';
-        setTimeout(() => this.successMessage = null, 3000);
+        setTimeout(() => this.successMessage = null, 50000);
 
         // Đóng modal trước khi làm mới danh sách
         this.modalService.dismissAll();

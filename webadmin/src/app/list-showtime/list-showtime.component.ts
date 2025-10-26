@@ -339,7 +339,7 @@ export class ListShowtimeComponent implements OnInit {
     formData.append('price', this.newShowtime.price.toString());
 
     this.showTimeService.createShowTime(formData).pipe(
-        timeout(10000),
+        timeout(500000),
         catchError(error => {
             console.error('Error adding showtime:', error);
             this.isLoading = false;

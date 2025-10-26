@@ -43,7 +43,7 @@ export class UserService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(`${Environment.apiBaseUrl}/users/admin`, { headers: headers, withCredentials: true }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToUsers(response)), // Backend đã trả về danh sách người dùng, không cần response.results
       catchError(this.handleError)
@@ -55,7 +55,7 @@ export class UserService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(`${Environment.apiBaseUrl}/users/customer`, { headers: headers, withCredentials: true }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToUsers(response)), // Backend đã trả về danh sách người dùng, không cần response.results
       catchError(this.handleError)
@@ -76,7 +76,7 @@ export class UserService {
       headers: headers,
       withCredentials: true,
     }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       catchError(this.handleError)
     );

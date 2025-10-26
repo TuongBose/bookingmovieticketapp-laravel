@@ -18,7 +18,7 @@ export class StatisticService {
     .set('Content-Type', 'application/json')
     .set('Accept', 'application/json');
     return this.http.get<any>(this.apiUrl, {headers: headers, withCredentials:true}).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       catchError(this.handleError)
     );

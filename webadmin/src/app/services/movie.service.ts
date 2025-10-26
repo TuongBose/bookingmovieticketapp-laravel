@@ -44,7 +44,7 @@ export class MovieService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(`${Environment.apiBaseUrl}/movies`, { headers: headers, withCredentials: true }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToMovies(response)), // Backend đã trả về danh sách phim, không cần response.results
       catchError(this.handleError)
@@ -56,7 +56,7 @@ export class MovieService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(`${Environment.apiBaseUrl}/movies/${id}`, { headers: headers, withCredentials: true }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToMovies([response])[0]), // Chuyển đổi thành MovieDTO
       catchError(this.handleError)

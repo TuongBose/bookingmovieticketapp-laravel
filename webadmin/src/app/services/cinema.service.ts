@@ -17,7 +17,7 @@ export class CinemaService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(`${Environment.apiBaseUrl}/cinemas`, { headers: headers, withCredentials: true }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToCinemas(response)), // Backend đã trả về danh sách phim, không cần response.results
       catchError(this.handleError)
@@ -32,7 +32,7 @@ export class CinemaService {
       headers: headers,
       withCredentials: true,
     }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       catchError(this.handleError)
     );
@@ -46,7 +46,7 @@ updateCinema(cinemaId: number, formData: FormData): Observable<any> {
     headers: headers,
     withCredentials: true,
   }).pipe(
-    timeout(5000),
+    timeout(500000),
     retry(1),
     catchError(this.handleError)
   );
@@ -61,7 +61,7 @@ updateCinemaStatus(cinemaId: number, isActive: boolean): Observable<{message:str
     return this.http.get(`${Environment.apiBaseUrl}/cinemas/${cinemaId}/image`, {
       responseType: 'blob'
     }).pipe(
-      timeout(5000),
+      timeout(500000),
       retry(1),
       catchError(this.handleError)
     );

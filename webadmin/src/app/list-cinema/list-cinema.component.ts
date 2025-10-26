@@ -62,7 +62,7 @@ export class ListCinemaComponent implements OnInit {
   fetchCinemas(): void {
     this.isLoading = true;
     this.cinemaService.getAllCinema().pipe(
-      timeout(10000), // Timeout sau 10 giây
+      timeout(500000), // Timeout sau 500 giây
       retry(2), // Thử lại 2 lần nếu lỗi
       catchError(error => {
         console.error('Error fetching cinemas:', error);
@@ -82,7 +82,7 @@ export class ListCinemaComponent implements OnInit {
 
   fetchProvinces(): void {
     this.http.get<any[]>('https://provinces.open-api.vn/api/?depth=2').pipe(
-      timeout(5000), // Timeout sau 5 giây
+      timeout(500000), // Timeout sau 500 giây
       catchError(error => {
         console.error('Error fetching provinces:', error);
         this.errorMessage = 'Không thể tải danh sách thành phố.';
@@ -186,7 +186,7 @@ export class ListCinemaComponent implements OnInit {
     }
 
     this.cinemaService.createCinema(formData).pipe(
-      timeout(10000),
+      timeout(500000),
       catchError(error => {
         console.error('Error adding cinema:', error);
         this.isLoading = false;
@@ -262,7 +262,7 @@ export class ListCinemaComponent implements OnInit {
     }
 
     this.cinemaService.updateCinema(this.editCinema.id, formData).pipe(
-      timeout(10000),
+      timeout(500000),
       catchError(error => {
         console.error('Error updating cinema:', error);
         this.isLoading = false;
@@ -288,7 +288,7 @@ export class ListCinemaComponent implements OnInit {
     this.successMessage = ''; // Reset successMessage
 
     this.cinemaService.updateCinemaStatus(cinemaId, newStatus).pipe(
-      timeout(10000),
+      timeout(500000),
       catchError(error => {
         console.error('Error toggling active:', error);
         this.isLoading = false;
