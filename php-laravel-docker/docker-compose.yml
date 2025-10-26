@@ -49,5 +49,20 @@ services:
     restart: unless-stopped
     depends_on:
       - mysql-php-container
+
+  # webadmin-container:
+  #   container_name: webadmin-container
+  #   build:
+  #     context: ../webadmin
+  #     dockerfile: Dockerfile
+  #   ports:
+  #    - "4200:80"
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:80/"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+      
 volumes:
   mysql_data:

@@ -20,7 +20,7 @@ export class MovieService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(this.apiMovieNowPlayingUrl, { headers: headers, withCredentials: true }).pipe(
-      timeout(50000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToMovies(response)), // Backend đã trả về danh sách phim, không cần response.results
       catchError(this.handleError)
@@ -32,7 +32,7 @@ export class MovieService {
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
     return this.http.get<any>(this.apiMovieUpComingUrl, { headers: headers, withCredentials: true }).pipe(
-      timeout(50000),
+      timeout(500000),
       retry(1),
       map(response => this.mapToMovies(response)), // Backend đã trả về danh sách phim, không cần response.results
       catchError(this.handleError)
