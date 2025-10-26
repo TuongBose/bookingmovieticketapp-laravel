@@ -32,11 +32,6 @@ protected $primaryKey = 'id';
         'createdat' => 'datetime'
     ];
 
-    // Ẩn password khi trả JSON
-    protected $hidden = [
-        'password',
-    ];
-
     public function bookings()
     {
         return $this->hasMany(Booking::class, 'userid');

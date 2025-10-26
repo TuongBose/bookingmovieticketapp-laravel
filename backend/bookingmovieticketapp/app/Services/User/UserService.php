@@ -5,7 +5,9 @@ namespace App\Services\User;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Repositories\User\IUserRepository;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class UserService implements IUserService
 {
@@ -22,19 +24,25 @@ class UserService implements IUserService
     public function createUser(UserRequest $userRequest)
     {
         $phoneNumber = $userRequest->phonenumber;
+        $email= $userRequest->email;
 
         if ($this->userRepository->existsByPhonenumber($phoneNumber)) {
             throw new Exception("Số điện thoại này đã tồn tại");
         }
 
+        if ($this->userRepository->existsByEmail($email)) {
+            throw new Exception("Email này đã tồn tại");
+        }
+
         $user = User::create([
             'name' => $userRequest->name,
             'email' => $userRequest->email,
-            'password' => $userRequest->password, // có thể dùng Hash::make()
+            'password' => $userRequest->password,
             'phonenumber' => $userRequest->phonenumber,
             'dateofbirth' => $userRequest->dateofbirth ?? null,
             'isactive' => true,
-            'rolename' => false, // false = customer, true = admin
+            'createdat' => Carbon::now(),
+            'rolename' => false,
         ]);
 
         return $user;
@@ -44,7 +52,11 @@ class UserService implements IUserService
     {
         $user = $this->userRepository->findByPhonenumber($phoneNumber);
 
-        if (!$user->isactive || !$user->rolename || $user->password !== $password) {
+        if (!$user) {
+            throw new Exception("Sai số điện thoại hoặc mật khẩu");
+        }
+
+        if (!$user->isactive || $user->rolename || $user->password !== $password) {
             throw new Exception("Sai số điện thoại hoặc mật khẩu");
         }
 
@@ -54,6 +66,7 @@ class UserService implements IUserService
     public function loginAdmin(string $phoneNumber, string $password)
     {
         $user = $this->userRepository->findByPhonenumber($phoneNumber);
+
         if (!$user) {
             throw new Exception("Sai số điện thoại hoặc mật khẩu");
         }

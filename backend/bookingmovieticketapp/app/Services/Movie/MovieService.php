@@ -245,17 +245,18 @@ class MovieService implements IMovieService
             Log::debug("Đang xử lý phim: {$movie->name} (ID: {$movie->id})");
 
             $existingCasts = $this->castRepository->findByMovieId($movie->id);
-            if (!empty($existingCasts)) {
+
+            if ($existingCasts->isNotEmpty()) {
                 Log::debug("Phim {$movie->name} (ID: {$movie->id}) đã có cast, bỏ qua.");
                 continue;
             }
 
             $castList = $this->getCasts($movie->id);
             foreach ($castList as $castData) {
-                $cast = new Cast();
-                $cast->movieid = $movie->id;
-                $cast->actorname = $castData['actorname'];
-                $cast->save();
+                Cast::create([
+                    'movieid' => $movie->id,
+                    'actorname' => $castData['actorname']
+                ]);
 
                 Log::info("Đã lưu cast cho phim {$movie->name} (Diễn viên: {$castData['actorname']})");
             }

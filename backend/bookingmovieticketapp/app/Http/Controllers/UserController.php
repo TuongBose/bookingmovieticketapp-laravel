@@ -28,7 +28,7 @@ class UserController extends Controller
                 return response()->json(['error' => 'Xác nhận mật khẩu không khớp'], 400);
             }
 
-            $newUser = $this->userService->createUser($data);
+            $newUser = $this->userService->createUser($request);
             return response()->json($newUser);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

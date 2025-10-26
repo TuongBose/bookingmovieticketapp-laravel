@@ -7,6 +7,7 @@ use App\Models\Cast;
 use App\Models\Movie;
 use App\Repositories\Cast\ICastRepository;
 use App\Repositories\Movie\IMovieRepository;
+use Illuminate\Support\Facades\Log;
 
 class CastService implements ICastService
 {
@@ -25,7 +26,7 @@ class CastService implements ICastService
 
     public function getCastByMovieId(int $movieId)
     {
-        $movie = Movie::findOrFail($movieId);
+        $movie = Movie::find($movieId);
         $casts = Cast::where('movieid', $movieId)->get();
         return CastResource::collection($casts);
     }

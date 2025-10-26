@@ -20,6 +20,11 @@ class UserRepository implements IUserRepository
         return User::where('phonenumber', $phoneNumber)->exists();
     }
 
+    public function existsByEmail(string $email): bool
+    {
+        return User::where('email', $email)->exists();
+    }
+
     public function findByPhonenumber(string $phoneNumber): ?User
     {
         return User::where('phonenumber', $phoneNumber)->first();
