@@ -276,11 +276,12 @@ class MovieService implements IMovieService
         $movies = [];
 
         foreach ($response['results'] as $tmdbMovie) {
+            $details = $this->getMovieDetails($tmdbMovie['id']);
             $movies[] = [
                 'id' => $tmdbMovie['id'],
                 'name' => $tmdbMovie['title'],
                 'description' => !empty($tmdbMovie['overview']) ? $tmdbMovie['overview'] : 'Chưa có thông tin',
-                'duration' => $this->getMovieRunTime($tmdbMovie['id']),
+                'duration' => $details['runtime'] ?? 0,
                 'releasedate' => !empty($tmdbMovie['release_date'])
                     ? Carbon::parse($tmdbMovie['release_date'])
                     : null,
@@ -290,9 +291,9 @@ class MovieService implements IMovieService
                 'bannerurl' => !empty($tmdbMovie['backdrop_path'])
                     ? "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path']
                     : null,
-                'agerating' => $this->getAgeCertification($tmdbMovie['id']),
+                'agerating' => $details['agerating'] ?? 'ALL',
                 'voteaverage' => $tmdbMovie['vote_average'] ?? 0,
-                'director' => $this->getDirector($tmdbMovie['id']),
+                'director' => $details['director'] ?? null,
             ];
         }
 
@@ -311,11 +312,12 @@ class MovieService implements IMovieService
         $movies = [];
 
         foreach ($response['results'] as $tmdbMovie) {
+            $details = $this->getMovieDetails($tmdbMovie['id']);
             $movies[] = [
                 'id' => $tmdbMovie['id'],
                 'name' => $tmdbMovie['title'],
                 'description' => !empty($tmdbMovie['overview']) ? $tmdbMovie['overview'] : 'Chưa có thông tin',
-                'duration' => $this->getMovieRunTime($tmdbMovie['id']),
+                'duration' => $details['runtime'] ?? 0,
                 'releasedate' => !empty($tmdbMovie['release_date'])
                     ? Carbon::parse($tmdbMovie['release_date'])
                     : null,
@@ -325,14 +327,85 @@ class MovieService implements IMovieService
                 'bannerurl' => !empty($tmdbMovie['backdrop_path'])
                     ? "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path']
                     : null,
-                'agerating' => $this->getAgeCertification($tmdbMovie['id']),
+                'agerating' =>  $details['agerating'] ?? 'ALL',
                 'voteaverage' => $tmdbMovie['vote_average'] ?? 0,
-                'director' => $this->getDirector($tmdbMovie['id']),
+                'director' => $details['director'] ?? null,
             ];
         }
 
         return $movies;
     }
+
+    // Old method
+    // public function getNowPlaying()
+    // {
+    //     $response = $this->getNowPlayingMovies();
+
+    //     if (empty($response) || empty($response['results'])) {
+    //         Log::warning("Không có dữ liệu phim đang chiếu từ TMDB.");
+    //         return [];
+    //     }
+
+    //     $movies = [];
+
+    //     foreach ($response['results'] as $tmdbMovie) {
+    //         $movies[] = [
+    //             'id' => $tmdbMovie['id'],
+    //             'name' => $tmdbMovie['title'],
+    //             'description' => !empty($tmdbMovie['overview']) ? $tmdbMovie['overview'] : 'Chưa có thông tin',
+    //             'duration' => $this->getMovieRunTime($tmdbMovie['id']),
+    //             'releasedate' => !empty($tmdbMovie['release_date'])
+    //                 ? Carbon::parse($tmdbMovie['release_date'])
+    //                 : null,
+    //             'posterurl' => !empty($tmdbMovie['poster_path'])
+    //                 ? "https://image.tmdb.org/t/p/w500" . $tmdbMovie['poster_path']
+    //                 : null,
+    //             'bannerurl' => !empty($tmdbMovie['backdrop_path'])
+    //                 ? "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path']
+    //                 : null,
+    //             'agerating' => $this->getAgeCertification($tmdbMovie['id']),
+    //             'voteaverage' => $tmdbMovie['vote_average'] ?? 0,
+    //             'director' => $this->getDirector($tmdbMovie['id']),
+    //         ];
+    //     }
+
+    //     return $movies;
+    // }
+
+    // public function getUpComing()
+    // {
+    //     $response = $this->getUpComingMovies();
+
+    //     if (empty($response) || empty($response['results'])) {
+    //         Log::warning("Không có dữ liệu phim sap chiếu từ TMDB.");
+    //         return [];
+    //     }
+
+    //     $movies = [];
+
+    //     foreach ($response['results'] as $tmdbMovie) {
+    //         $movies[] = [
+    //             'id' => $tmdbMovie['id'],
+    //             'name' => $tmdbMovie['title'],
+    //             'description' => !empty($tmdbMovie['overview']) ? $tmdbMovie['overview'] : 'Chưa có thông tin',
+    //             'duration' => $this->getMovieRunTime($tmdbMovie['id']),
+    //             'releasedate' => !empty($tmdbMovie['release_date'])
+    //                 ? Carbon::parse($tmdbMovie['release_date'])
+    //                 : null,
+    //             'posterurl' => !empty($tmdbMovie['poster_path'])
+    //                 ? "https://image.tmdb.org/t/p/w500" . $tmdbMovie['poster_path']
+    //                 : null,
+    //             'bannerurl' => !empty($tmdbMovie['backdrop_path'])
+    //                 ? "https://image.tmdb.org/t/p/w1280" . $tmdbMovie['backdrop_path']
+    //                 : null,
+    //             'agerating' => $this->getAgeCertification($tmdbMovie['id']),
+    //             'voteaverage' => $tmdbMovie['vote_average'] ?? 0,
+    //             'director' => $this->getDirector($tmdbMovie['id']),
+    //         ];
+    //     }
+
+    //     return $movies;
+    // }
 
     public function getAllMovie()
     {
@@ -349,4 +422,48 @@ class MovieService implements IMovieService
         return Movie::findOrFail($id);
     }
 
+    private function getMovieDetails(int $movieId)
+    {
+        try {
+            $url = "https://api.themoviedb.org/3/movie/{$movieId}?api_key={$this->apiKey}&append_to_response=release_dates,credits&language=en-US";
+            $response = Http::get($url);
+
+            if (!$response->successful())
+                return null;
+            $data = $response->json();
+
+            // Lấy runtime
+            $runtime = $data['runtime'] ?? 0;
+
+            // Lấy độ tuổi
+            $certification = 'ALL';
+            foreach ($data['release_dates']['results'] ?? [] as $country) {
+                if ($country['iso_3166_1'] === 'US') {
+                    $releaseDates = $country['release_dates'] ?? [];
+                    if (!empty($releaseDates)) {
+                        $certification = $this->mapAgeRating($releaseDates[0]['certification'] ?? '');
+                        break;
+                    }
+                }
+            }
+
+            // Lấy đạo diễn
+            $director = null;
+            foreach ($data['credits']['crew'] ?? [] as $crew) {
+                if (($crew['job'] ?? '') === 'Director') {
+                    $director = $crew['name'];
+                    break;
+                }
+            }
+
+            return [
+                'runtime' => $runtime,
+                'agerating' => $certification,
+                'director' => $director,
+            ];
+        } catch (Exception $e) {
+            Log::error("Lỗi khi lấy chi tiết phim {$movieId}: " . $e->getMessage());
+            return null;
+        }
+    }
 }
