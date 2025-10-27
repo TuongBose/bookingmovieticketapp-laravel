@@ -1,0 +1,13 @@
+.section-title {
+  border-left: 5px solid #ffcc00;
+  padding-left: 10px;
+  font-weight: 600;
+}
+.carousel-item img {
+  height: 500px;
+  object-fit: cover;
+}
+.card img {
+  height: 350px;
+  object-fit: cover;
+}

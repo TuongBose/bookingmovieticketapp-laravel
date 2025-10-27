@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cinema;
+use App\Services\Cinema\ICinemaService;
 use App\Services\Movie\IMovieService;
 use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
     protected $movieService;
+    protected $cinemaService;
 
-    public function __construct(IMovieService $movieService)
+    public function __construct(IMovieService $movieService, ICinemaService $cinemaService)
     {
         $this->movieService = $movieService;
+        $this->cinemaService = $cinemaService;
     }
 
     public function getNowPlaying()
@@ -46,5 +50,17 @@ class MovieController extends Controller
     {
         $movies = $this->movieService->getAllMovie();
         return response()->json($movies);
+    }
+
+    public function show($id)
+    {
+        try {
+            $movie = $this->movieService->getMovieById($id);
+            $cinemas = $this->cinemaService->getAllCinema(); 
+
+            return view('movies.show', compact('movie', 'cinemas'));
+        } catch (\Exception $e) {
+            abort(404, 'Phim không tồn tại');
+        }
     }
 }
