@@ -48,7 +48,7 @@ class MovieController extends Controller
         try {
             $movie = $this->movieService->getMovieById($id);
             return response()->json($movie);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
@@ -84,7 +84,7 @@ class MovieController extends Controller
             $trailer = $this->movieService->getMovieTrailer($id);
 
             return view('movies.moviedetail', compact('movie', 'cinemas', 'casts', 'trailer'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             abort(404, 'Phim không tồn tại');
         }
     }
