@@ -3,19 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cinema;
+use App\Services\Cast\ICastService;
 use App\Services\Cinema\ICinemaService;
 use App\Services\Movie\IMovieService;
+use Exception;
 use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
     protected $movieService;
     protected $cinemaService;
+    protected $castService;
 
-    public function __construct(IMovieService $movieService, ICinemaService $cinemaService)
-    {
+    public function __construct(
+        IMovieService $movieService,
+        ICinemaService $cinemaService,
+        ICastService $castService
+    ) {
         $this->movieService = $movieService;
         $this->cinemaService = $cinemaService;
+        $this->castService = $castService;
     }
 
     public function getNowPlaying()
@@ -52,13 +59,31 @@ class MovieController extends Controller
         return response()->json($movies);
     }
 
-    public function show($id)
+    public function getTrailer($id)
+    {
+        try {
+            $trailer = $this->movieService->getMovieTrailer($id);
+
+            if (!$trailer) {
+                return response()->json(['message' => 'Không tìm thấy trailer cho phim này'], 404);
+            }
+
+            return response()->json($trailer);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function moviedetail($id)
     {
         try {
             $movie = $this->movieService->getMovieById($id);
-            $cinemas = $this->cinemaService->getAllCinema(); 
+            $cinemas = $this->cinemaService->getAllCinema();
+            $casts = $this->castService->getCastByMovieId($id);
+            $trailer = $this->movieService->getMovieTrailer($id);
 
-            return view('movies.show', compact('movie', 'cinemas'));
+            return view('movies.moviedetail', compact('movie', 'cinemas', 'casts', 'trailer'));
         } catch (\Exception $e) {
             abort(404, 'Phim không tồn tại');
         }

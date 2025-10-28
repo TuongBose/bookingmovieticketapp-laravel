@@ -41,6 +41,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'ce9671a430e4846b44e1c68c7611f9f5' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'a1cfe24d14977df6878b9bf804af2d1c' => __DIR__ . '/..' . '/nunomaduro/collision/src/Adapters/Phpunit/Autoload.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
+        'acff4eefdab47c0932fee05e22b69be3' => __DIR__ . '/../..' . '/app/Helpers/age_rating.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -538,6 +539,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Http\\Controllers\\CastController' => __DIR__ . '/../..' . '/app/Http/Controllers/CastController.php',
         'App\\Http\\Controllers\\CinemaController' => __DIR__ . '/../..' . '/app/Http/Controllers/CinemaController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
         'App\\Http\\Controllers\\MovieController' => __DIR__ . '/../..' . '/app/Http/Controllers/MovieController.php',
         'App\\Http\\Controllers\\RoomController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoomController.php',
         'App\\Http\\Controllers\\SeatController' => __DIR__ . '/../..' . '/app/Http/Controllers/SeatController.php',

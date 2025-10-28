@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/{id}', [MovieController::class, 'show'])->name('movie.show');
+Route::get('/{id}', [MovieController::class, 'moviedetail'])->name('movie.moviedetail');
 
 // Route::prefix('api/v1/bookings')->group(function () {
 //     Route::post('/', [BookingController::class, 'createBooking']);

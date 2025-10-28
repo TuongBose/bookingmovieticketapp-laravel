@@ -9,4 +9,5 @@ interface IMovieService
     public function getAllMovie();
     public function existsByName(string $name);
     public function getMovieById(int $id);
+    public function getMovieTrailer(int $movieId);
 }

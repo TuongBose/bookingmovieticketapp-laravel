@@ -466,4 +466,51 @@ class MovieService implements IMovieService
             return null;
         }
     }
+
+    public function getMovieTrailer(int $movieId)
+    {
+        try {
+            $url = "https://api.themoviedb.org/3/movie/{$movieId}/videos?api_key={$this->apiKey}&language=en-US";
+            $response = Http::get($url);
+
+            if (!$response->successful()) {
+                Log::warning("Không thể lấy trailer cho movieId {$movieId} từ TMDB.");
+                return null;
+            }
+
+            $data = $response->json();
+            $videos = $data['results'] ?? [];
+
+            if (empty($videos)) {
+                Log::info("Không có video nào cho movieId {$movieId}.");
+                return null;
+            }
+
+            $trailer = collect($videos)->first(function ($video) {
+                return strtolower($video['site'] ?? '') === 'youtube'
+                    && strtolower($video['type'] ?? '') === 'trailer';
+            });
+
+            if ($trailer) {
+                return [
+                    'name' => $trailer['name'],
+                    'key' => $trailer['key'],
+                    'url' => "https://www.youtube.com/watch?v=" . $trailer['key'],
+                    'embed_url' => "https://www.youtube.com/embed/" . $trailer['key'],
+                ];
+            }
+
+            // fallback: nếu không có trailer, lấy video đầu tiên
+            $firstVideo = $videos[0];
+            return [
+                'name' => $firstVideo['name'],
+                'key' => $firstVideo['key'],
+                'url' => "https://www.youtube.com/watch?v=" . $firstVideo['key'],
+                'embed_url' => "https://www.youtube.com/embed/" . $firstVideo['key'],
+            ];
+        } catch (Exception $e) {
+            Log::error("Lỗi khi lấy trailer cho movieId {$movieId}: " . $e->getMessage());
+            return null;
+        }
+    }
 }

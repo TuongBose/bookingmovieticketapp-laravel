@@ -51,6 +51,8 @@ Route::prefix('v1/movies')->group(function () {
     // Route::get('/similar/{movieId}', [MovieController::class, 'getSimilarMovies']);
     Route::get('/{id}', [MovieController::class, 'getMovieById']);
     Route::get('/', [MovieController::class, 'getAllMovie']);
+    Route::get('/{id}/trailer', [MovieController::class, 'getTrailer'])->name('movies.trailer');
+
 });
 
 Route::prefix('v1/rooms')->group(function () {

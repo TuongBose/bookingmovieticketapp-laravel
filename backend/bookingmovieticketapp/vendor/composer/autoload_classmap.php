@@ -11,6 +11,7 @@ return array(
     'App\\Http\\Controllers\\CastController' => $baseDir . '/app/Http/Controllers/CastController.php',
     'App\\Http\\Controllers\\CinemaController' => $baseDir . '/app/Http/Controllers/CinemaController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Controllers\\HomeController' => $baseDir . '/app/Http/Controllers/HomeController.php',
     'App\\Http\\Controllers\\MovieController' => $baseDir . '/app/Http/Controllers/MovieController.php',
     'App\\Http\\Controllers\\RoomController' => $baseDir . '/app/Http/Controllers/RoomController.php',
     'App\\Http\\Controllers\\SeatController' => $baseDir . '/app/Http/Controllers/SeatController.php',
