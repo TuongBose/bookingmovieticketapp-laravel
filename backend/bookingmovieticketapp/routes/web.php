@@ -12,10 +12,22 @@ use App\Http\Controllers\ShowTimeController;
 use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+//Auth Routes for Login, Register, and Password Reset --Kdan
+Route::get('/auth', [AuthController::class, 'showAuthPage'])->name('auth');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkByPhone'])->name('password.phone');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+//--------------------------------------------------------------------------------------------------------------------
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/{id}', [MovieController::class, 'moviedetail'])->name('movie.moviedetail');

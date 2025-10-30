@@ -11,7 +11,7 @@
         <li><a href="{{ url('/showtimes') }}">Lịch chiếu</a></li>
         <li><a href="{{ url('/promotions') }}">Khuyến mãi</a></li>
         <li><a href="{{ url('/cinemas') }}">Chọn rạp</a></li>
-        <li><a href="{{ url('/login') }}">Đăng nhập</a></li>
+        <li><a href="{{ url('/auth') }}">Đăng nhập</a></li>
       </ul>
     </nav>
     <div class="header-action">

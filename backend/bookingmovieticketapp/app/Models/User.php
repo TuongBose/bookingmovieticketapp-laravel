@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
-class User extends Model
+class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
     protected $table = 'users';
-protected $primaryKey = 'id';
+    protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = false;
+
     protected $fillable = [
         'name',
         'email',
@@ -20,16 +23,22 @@ protected $primaryKey = 'id';
         'address',
         'dateofbirth',
         'imagename',
-        'createdat',
+        'createdat', //can thiet cho viec luu tru
         'isactive',
         'rolename'
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token', 
     ];
 
     protected $casts = [
         'isactive' => 'boolean',
         'rolename' => 'boolean',
         'dateofbirth' => 'date',
-        'createdat' => 'datetime'
+        'createdat' => 'datetime',
+        //'password' => 'hashed', // Tự động mã hóa
     ];
 
     public function bookings()
