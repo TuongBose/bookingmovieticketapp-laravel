@@ -73,19 +73,58 @@
                 </div>
 
                 <!-- Lịch chiếu -->
-                <div class="text-center showtime-container">
+                <div class="text-center showtime-container" data-movie-id="{{ $movie->id }}">
                     <h3>Lịch chiếu</h3>
+
                     <div class="date-selector my-4 d-flex justify-content-center flex-wrap gap-3" id="dateContainer">
                         {{-- Các ô ngày sẽ được render bằng JavaScript --}}
                     </div>
-                    <div class="mb-3">
-                        <label>Chọn rạp:</label>
-                        <select id="cinemaSelect" class="form-select">
-                            <option value="">-- Chọn rạp --</option>
-                            @foreach($cinemas as $cinema)
-                                <option value="{{ $cinema->id }}">{{ $cinema->name }}</option>
-                            @endforeach
-                        </select>
+
+                    <h2 class="text-uppercase fw-bold text-white">Danh sách rạp</h2>
+                    <div class="showtime-wrapper">
+                        <!-- CHỌN THÀNH PHỐ -->
+                        <div class="d-flex justify-content-center align-items-center gap-3 my-4 city-select-wrapper">
+                            <div class="flex-fill">
+                                <select id="citySelect" class="form-select form-select-sm">
+                                    <option value="">-- Tất cả thành phố --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SUẤT CHIẾU -->
+                        <div id="showtimes-container" class="mt-4">
+                            <p class="text-muted">Vui lòng chọn ngày và rạp.</p>
+                        </div>
+
+                        <!-- SƠ ĐỒ GHẾ - HIỆN KHI CHỌN SUẤT -->
+                        <div id="seat-selection-container" class="mt-5 p-4 bg-dark rounded d-none">
+                            <div class="text-center mb-3">
+                                <h5 class="text-white">Chọn ghế - <span id="selected-cinema-name"></span></h5>
+                                <small class="text-muted">Màn hình</small>
+                                <div class="screen mb-4"></div>
+                            </div>
+                            <div id="seat-map" class="d-flex justify-content-center flex-wrap gap-2 mb-4"></div>
+                            <div class="seat-legend d-flex justify-content-center gap-4 flex-wrap mt-3 mb-4">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="seat-legend-box" style="background: white; border: 1px solid #555;"></div>
+                                    <span class="text-white small">Ghế Thường</span>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="seat-legend-box" style="background: #ff9800;"></div>
+                                    <span class="text-white small">Ghế chọn</span>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="seat-legend-box" style="background: #555; border: 1px solid #666;"></div>
+                                    <span class="text-white small">Ghế đã đặt</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button id="confirm-seats" class="btn btn-warning px-5" disabled>Xác nhận đặt vé</button>
+                                <button id="cancel-seat-selection" class="btn btn-outline-secondary ms-2">Hủy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,33 +132,295 @@
     </div>
 
     <script>
-        // === Sinh ra 5 ngày từ hôm nay ===
+        const showtimeContainer = document.querySelector('.showtime-container');
+        const movieId = showtimeContainer.dataset.movieId;
         const dateContainer = document.getElementById('dateContainer');
+        const citySelect = document.getElementById('citySelect');
+        const showtimesContainer = document.getElementById('showtimes-container');
+
+        let selectedShowId = null;
+        let selectedSeats = [];
+
         const daysOfWeek = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+        let selectedDate = null;
+        let selectedCity = 'all'; // Mặc định là ALL
 
-        const today = new Date();
-        for (let i = 0; i < 5; i++) {
-            const date = new Date(today);
-            date.setDate(today.getDate() + i);
+        // === 1. TẠO 5 NGÀY ===
+        function renderDates() {
+            const today = new Date();
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
 
-            const day = daysOfWeek[date.getDay()];
-            const formatted = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const dayName = daysOfWeek[date.getDay()];
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const fullDate = date.toISOString().split('T')[0];
 
-            const div = document.createElement('div');
-            div.classList.add('date-box');
-            div.innerHTML = `<strong>${formatted}</strong><br>${day}`;
-            div.dataset.date = date.toISOString().split('T')[0];
+                const div = document.createElement('div');
+                div.className = 'date-box' + (i === 0 ? ' active' : '');
+                div.dataset.date = fullDate;
+                div.innerHTML = `<strong>${day}/${month}</strong><br><small>${dayName}</small>`;
 
-            if (i === 0) div.classList.add('active');
+                div.addEventListener('click', () => {
+                    document.querySelectorAll('.date-box').forEach(el => el.classList.remove('active'));
+                    div.classList.add('active');
+                    selectedDate = fullDate;
+                    loadAllShowtimes(); // TẢI TẤT CẢ SUẤT CHIẾU
+                });
 
-            div.addEventListener('click', function () {
-                document.querySelectorAll('.date-box').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
-                // có thể fetch lịch chiếu theo ngày ở đây:
-                // loadShowtimeForDate(this.dataset.date);
+                dateContainer.appendChild(div);
+            }
+            selectedDate = today.toISOString().split('T')[0]; // Hôm nay
+        }
+
+        // === 2. LẤY TẤT CẢ THÀNH PHỐ TỪ API CINEMA ===
+        async function loadCities() {
+            try {
+                const res = await fetch('/api/v1/cinemas');
+                const cinemas = await res.json();
+
+                const cities = ['all', ...new Set(cinemas.map(c => c.city))].sort((a, b) => {
+                    if (a === 'all') return -1;
+                    if (b === 'all') return 1;
+                    return a.localeCompare(b);
+                });
+
+                citySelect.innerHTML = '';
+                cities.forEach(city => {
+                    const opt = document.createElement('option');
+                    opt.value = city === 'all' ? 'all' : city;
+                    opt.textContent = city === 'all' ? 'Tất cả thành phố' : city;
+                    citySelect.appendChild(opt);
+                });
+
+                citySelect.value = 'all'; // Mặc định ALL
+            } catch (err) {
+                console.error('Lỗi tải thành phố:', err);
+            }
+        }
+
+        // === 3. LẤY TẤT CẢ RẠP + SUẤT CHIẾU (city = all hoặc cụ thể) ===
+        async function loadAllShowtimes() {
+            showtimesContainer.innerHTML = '<p class="text-muted"><i class="fa fa-spinner fa-spin"></i> Đang tải lịch chiếu...</p>';
+
+            const encodedCity = encodeURIComponent(selectedCity);
+            try {
+                // B1: Lấy danh sách rạp theo movie + city + date
+                const cinemaRes = await fetch(`/api/v1/cinemas/movieandcityanddate?movieId=${movieId}&city=${encodedCity}&date=${selectedDate}`);
+                const cinemas = await cinemaRes.json();
+
+                if (cinemas.length === 0) {
+                    showtimesContainer.innerHTML = '<p class="text-muted">Không có rạp nào chiếu phim này vào ngày này.</p>';
+                    return;
+                }
+
+                let html = '';
+
+                // B2: Với mỗi rạp → gọi API showtimes
+                for (const cinema of cinemas) {
+                    try {
+                        const showRes = await fetch(`/api/v1/showtimes?movieId=${movieId}&cinemaId=${cinema.id}&date=${selectedDate}`);
+                        const showtimes = await showRes.json();
+
+                        if (showtimes.length === 0) continue;
+
+                        html += `
+                                                                    <div class="cinema-showtime-block mb-4 p-3 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid #444;">
+                                                                        <h5 class="text-warning mb-2">${cinema.name}</h5>
+                                                                        <p class="text-muted small mb-2">${cinema.address}</p>
+                                                                        <div class="d-flex flex-wrap gap-2 justify-content-start">
+                                                                `;
+
+                        showtimes.forEach(show => {
+                            const time = new Date(show.starttime).toLocaleTimeString('vi-VN', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            html += `
+                                                                        <a href="/book/${movieId}/${show.id}" class="btn btn-outline-light btn-sm">
+                                                                            ${time}
+                                                                        </a>`;
+                        });
+
+                        html += `</div></div>`;
+                    } catch (err) {
+                        console.error(`Lỗi lấy suất chiếu rạp ${cinema.id}:`, err);
+                    }
+                }
+
+                if (!html) {
+                    showtimesContainer.innerHTML = '<p class="text-muted">Không có suất chiếu nào.</p>';
+                } else {
+                    showtimesContainer.innerHTML = html;
+
+                    attachShowtimeClick();
+                }
+            } catch (err) {
+                showtimesContainer.innerHTML = '<p class="text-danger">Lỗi tải dữ liệu</p>';
+                console.error(err);
+            }
+        }
+
+        // === 4. KHI CLICK VÀO SUẤT CHIẾU ===
+        function attachShowtimeClick() {
+            document.querySelectorAll('#showtimes-container a').forEach(btn => {
+                btn.addEventListener('click', async function (e) {
+                    e.preventDefault();
+
+                    document.getElementById('seat-selection-container').classList.add('d-none');
+
+                    const href = this.getAttribute('href');
+                    selectedShowId = href.split('/').pop();
+
+                    const cinemaName = this.closest('.cinema-showtime-block').querySelector('h5').textContent;
+                    document.getElementById('selected-cinema-name').textContent = cinemaName;
+
+                    await loadAndRenderSeats(selectedShowId);
+                    document.getElementById('seat-selection-container').classList.remove('d-none');
+                    document.getElementById('seat-selection-container').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        }
+
+        // === 5. LẤY ROOM + RENDER GHẾ ===
+        async function loadAndRenderSeats(showId) {
+            const seatMap = document.getElementById('seat-map');
+            seatMap.innerHTML = '<p class="text-muted">Đang tải sơ đồ ghế...</p>';
+
+            try {
+                // === B1: Lấy thông tin suất chiếu → roomId + room info
+                const showRes = await fetch(`/api/v1/showtimes/${showId}`);
+                const show = await showRes.json();
+                const roomId = show.roomId;
+
+                const roomRes = await fetch(`/api/v1/rooms/${roomId}`);
+                const room = await roomRes.json();
+                const rows = room.seatrowmax;
+                const cols = room.seatcolumnmax;
+
+                // Tính chiều rộng cần thiết
+                const estimatedWidth = cols * 46; // 38px + gap ~8px
+                const containerWidth = 660; // 700px - padding
+                let seatSize = 38;
+                let fontSize = 12;
+
+                if (estimatedWidth > containerWidth) {
+                    seatSize = Math.floor(containerWidth / cols) - 8; // trừ gap
+                    seatSize = Math.max(28, seatSize); // không nhỏ quá
+                    fontSize = seatSize < 34 ? 10 : 11;
+                }
+
+                // Áp dụng style động
+                const style = document.createElement('style');
+                style.textContent = `
+            #seat-map .seat-btn {
+                width: ${seatSize}px !important;
+                height: ${seatSize}px !important;
+                font-size: ${fontSize}px !important;
+            }
+        `;
+                document.head.appendChild(style);
+
+                // === B2: LẤY GHẾ ĐÃ ĐẶT THEO showtimeId
+                const bookedSet = new Set();
+
+                try {
+                    const bookingRes = await fetch(`/api/v1/bookings/showtimes/${showId}/bookings`);
+                    const bookings = await bookingRes.json(); // Mảng booking
+
+                    // Lặp từng booking → lấy chi tiết ghế
+                    for (const booking of bookings) {
+                        const detailRes = await fetch(`/api/v1/bookingdetails/${booking.id}/details`);
+                        const details = await detailRes.json();
+
+                        details.forEach(detail => {
+                            if (detail.seatnumber) {
+                                bookedSet.add(detail.seatnumber); // ← Ghế đã đặt
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.warn('Lỗi lấy ghế đã đặt (có thể chưa có booking):', err);
+                    // Không lỗi → vẫn render ghế trống
+                }
+
+                // === B3: RENDER GHẾ
+                let html = '';
+                const rowsLabel = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, rows);
+
+                for (let r = 0; r < rows; r++) {
+                    const rowLetter = rowsLabel[r];
+                    html += `<div class="d-flex gap-1 align-items-center mb-1">`;
+                    html += `<span class="text-warning me-2" style="width:20px;">${rowLetter}</span>`;
+
+                    for (let c = 1; c <= cols; c++) {
+                        const seatNum = `${rowLetter}${c}`;
+                        const isBooked = bookedSet.has(seatNum);
+
+                        html += `
+                                <button class="seat-btn ${isBooked ? 'booked' : 'available'}"
+                                        data-seat="${seatNum}"
+                                        ${isBooked ? 'disabled' : ''}>
+                                    ${c}
+                                </button>`;
+                    }
+                    html += `</div>`;
+                }
+
+                seatMap.innerHTML = html;
+                attachSeatClick();
+
+            } catch (err) {
+                seatMap.innerHTML = '<p class="text-danger">Lỗi tải sơ đồ ghế</p>';
+                console.error(err);
+            }
+        }
+
+        // === 6. CHỌN GHẾ ===
+        function attachSeatClick() {
+            const confirmBtn = document.getElementById('confirm-seats');
+            selectedSeats = [];
+
+            document.querySelectorAll('.seat-btn.available').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const seat = this.dataset.seat;
+                    if (this.classList.contains('selected')) {
+                        this.classList.remove('selected');
+                        selectedSeats = selectedSeats.filter(s => s !== seat);
+                    } else {
+                        this.classList.add('selected');
+                        selectedSeats.push(seat);
+                    }
+                    confirmBtn.disabled = selectedSeats.length === 0;
+                });
             });
 
-            dateContainer.appendChild(div);
+            confirmBtn.onclick = () => {
+                if (selectedSeats.length > 0) {
+                    window.location.href = `/book/${movieId}/${selectedShowId}?seats=${selectedSeats.join(',')}`;
+                }
+            };
         }
+
+        // === SỰ KIỆN ===
+        citySelect.addEventListener('change', () => {
+            selectedCity = citySelect.value;
+            loadAllShowtimes();
+        });
+
+        // === HỦY CHỌN GHẾ ===
+        document.getElementById('cancel-seat-selection').addEventListener('click', () => {
+            document.getElementById('seat-selection-container').classList.add('d-none');
+            selectedSeats = [];
+        });
+
+        // === KHỞI ĐỘNG ===
+        window.addEventListener('load', () => {
+            renderDates();
+            loadCities().then(() => {
+                loadAllShowtimes(); // TỰ ĐỘNG HIỂN THỊ KHI VÀO TRANG
+            });
+        });
     </script>
 @endsection

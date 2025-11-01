@@ -251,3 +251,163 @@
     );
     border-radius: 2px;
 }
+
+#showtimes-container {
+    max-width: 700px;           
+    width: 100%;
+    margin: 0 auto;             
+    padding: 20px;
+    background: rgba(30, 30, 30, 0.6);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.showtime-wrapper {
+    max-width: 700px;
+    margin: 0 auto; 
+}
+
+#citySelect {
+    width: 50%;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1.5px solid #ff9800;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* === DIV GHẾ (KHÔNG MODAL) === */
+#seat-selection-container {
+    background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+    border: 1.5px solid #ff9800;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(255, 152, 0, 0.2);
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === MÀN HÌNH === */
+.screen {
+    width: 80%;
+    height: 10px;
+    background: linear-gradient(135deg, #ff9800, #ffc107);
+    border-radius: 10px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+
+/* === GHẾ === */
+.seat-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.seat-btn.available {
+    background: white;
+    color: black;
+    border: 1px solid #555;
+}
+
+.seat-btn.available:hover {
+    background: #ff9800;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+}
+
+.seat-btn.selected {
+    background: #ff9800 !important;
+    color: white;
+    box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
+}
+
+.seat-btn.booked {
+    background: #444;
+    color: #999;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.seat-btn.booked::after {
+    display: none !important;
+}
+
+/* === FIX TRÀN GHẾ KHI NHIỀU CỘT === */
+#seat-map {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 0;
+    margin: 0 auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ff9800 #333;
+}
+
+/* Thanh cuộn đẹp */
+#seat-map::-webkit-scrollbar {
+    height: 8px;
+}
+
+#seat-map::-webkit-scrollbar-track {
+    background: #222;
+    border-radius: 4px;
+}
+
+#seat-map::-webkit-scrollbar-thumb {
+    background: #ff9800;
+    border-radius: 4px;
+}
+
+#seat-map::-webkit-scrollbar-thumb:hover {
+    background: #ffc107;
+}
+
+/* === GHẾ NHỎ HƠN KHI NHIỀU CỘT === */
+#seat-map .d-flex {
+    min-width: fit-content;
+    justify-content: center !important;
+}
+
+/* Tự động giảm kích thước ghế nếu > 16 cột */
+@media (max-width: 768px) {
+    .seat-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+    }
+}
+
+/* === CHÚ THÍCH GHẾ === */
+.seat-legend {
+    padding: 12px 0;
+    border-top: 1px solid #444;
+    border-bottom: 1px solid #444;
+}
+
+.seat-legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.seat-legend .small {
+    font-size: 13px;
+    color: #ddd;
+}
