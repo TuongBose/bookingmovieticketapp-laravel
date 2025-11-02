@@ -13,6 +13,7 @@ use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Auth;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -31,6 +32,16 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/{id}', [MovieController::class, 'moviedetail'])->name('movie.moviedetail');
+
+Route::get('api/v1/auth/check', function () {
+    if (Auth::check()) {
+        return response()->json([
+            'authenticated' => true,
+            'user' => Auth::user()
+        ]);
+    }
+    return response()->json(['authenticated' => false]);
+});
 
 // Route::prefix('api/v1/bookings')->group(function () {
 //     Route::post('/', [BookingController::class, 'createBooking']);

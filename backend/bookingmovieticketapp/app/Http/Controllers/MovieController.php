@@ -78,10 +78,10 @@ class MovieController extends Controller
     public function moviedetail($id)
     {
         try {
-            $movie = $this->movieService->getMovieById($id);
+            $movie = $this->movieService->getMovieById((int)$id);
             $cinemas = $this->cinemaService->getAllCinema();
-            $casts = $this->castService->getCastByMovieId($id);
-            $trailer = $this->movieService->getMovieTrailer($id);
+            $casts = $this->castService->getCastByMovieId((int)$id);
+            $trailer = $this->movieService->getMovieTrailer((int)$id);
 
             return view('movies.moviedetail', compact('movie', 'cinemas', 'casts', 'trailer'));
         } catch (Exception $e) {

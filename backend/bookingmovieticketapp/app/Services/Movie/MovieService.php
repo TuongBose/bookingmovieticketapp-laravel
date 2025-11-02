@@ -419,7 +419,7 @@ class MovieService implements IMovieService
 
     public function getMovieById(int $id)
     {
-        return Movie::findOrFail($id);
+        return Movie::find($id);
     }
 
     private function getMovieDetails(int $movieId)
