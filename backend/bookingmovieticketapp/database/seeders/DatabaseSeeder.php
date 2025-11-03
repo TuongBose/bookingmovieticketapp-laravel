@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Services\Booking\BookingService;
 use App\Services\Movie\MovieService;
 use App\Services\Room\RoomService;
 use App\Services\Seat\SeatService;
@@ -31,5 +32,6 @@ class DatabaseSeeder extends Seeder
         app(RoomService::class)->generateRoomsForAllCinemas();
         app(SeatService::class)->generateSeatsForAllRooms();
         app(ShowTimeService::class)->generateShowtimesForAllRooms();
+        app(BookingService::class)->updateBookingStatus();
     }
 }

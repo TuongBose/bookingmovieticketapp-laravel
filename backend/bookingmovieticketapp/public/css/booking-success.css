@@ -1,0 +1,26 @@
+/* public/css/booking-success.css */
+.success-wrapper {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 40px 0;
+}
+
+.success-card {
+    background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.ticket {
+    font-family: 'Courier New', monospace;
+}
+
+@media print {
+    body * { visibility: hidden; }
+    .success-card, .success-card * { visibility: visible; }
+    .success-card { position: absolute; left: 0; top: 0; width: 100%; }
+    .btn { display: none; }
+}

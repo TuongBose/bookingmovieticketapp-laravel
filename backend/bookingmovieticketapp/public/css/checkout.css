@@ -1,0 +1,213 @@
+.checkout-page-wrapper {
+    background-color: #0a0a0a;
+    color: #e0e0e0;
+    min-height: calc(100vh - 200px);
+    padding: 20px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.checkout-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.checkout-card {
+    background: transparent;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.checkout-header {
+    background: linear-gradient(135deg, #ff9800 0%, #ff6b00 100%);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 3px solid #ffc107;
+}
+
+.checkout-header h3 {
+    color: #000;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.checkout-body {
+    padding: 30px;
+}
+
+/* Phim */
+.checkout-movie-info {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    margin-bottom: 24px;
+}
+
+.checkout-movie-info h5 {
+    color: #ffffff;
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.checkout-age-badge {
+    background: linear-gradient(135deg, #666 0%, #444 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Grid thông tin */
+.checkout-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.checkout-info-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    transition: all 0.3s ease;
+}
+
+.checkout-info-item:hover {
+    background: rgba(255, 152, 0, 0.1);
+    border-color: #ff9800;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.2);
+}
+
+.checkout-info-item small {
+    color: #aaa;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.checkout-info-item p {
+    color: #ffffff;
+    margin: 0;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.checkout-seats {
+    color: #ff6b6b !important;
+    font-weight: 600;
+}
+
+.checkout-seats small {
+    color: #aaa;
+    font-size: 13px;
+}
+
+/* Tổng tiền */
+.checkout-total-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    margin-bottom: 24px;
+}
+
+.checkout-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkout-total-row h5 {
+    color: #ffffff;
+    margin: 0;
+    font-weight: 600;
+}
+
+.checkout-total-row small {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.checkout-total-row h3 {
+    color: #ff9800;
+    margin: 0;
+    font-weight: 700;
+    font-size: 28px;
+    text-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+}
+
+/* Nút */
+.checkout-actions {
+    display: grid;
+    gap: 12px;
+}
+
+.checkout-btn-confirm {
+    background: linear-gradient(135deg, #ff6b00 0%, #ff9800 100%);
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+
+.checkout-btn-confirm:hover {
+    background: linear-gradient(135deg, #ff9800 0%, #ff6b00 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 152, 0, 0.6);
+}
+
+.checkout-btn-back {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background: transparent;
+    border: 1.5px solid #666;
+    color: #ccc;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn-back:hover {
+    background: #333;
+    border-color: #ff9800;
+    color: #ff9800;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .checkout-info-grid {
+        grid-template-columns: 1fr;
+    }
+    .checkout-container {
+        padding: 20px;
+    }
+    .checkout-body {
+        padding: 20px;
+    }
+}

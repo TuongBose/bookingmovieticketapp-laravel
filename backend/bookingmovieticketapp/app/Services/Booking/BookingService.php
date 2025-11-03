@@ -30,11 +30,9 @@ class BookingService implements IBookingService
         $this->bookingRepository = $bookingRepository;
         $this->showTimeRepository = $showTimeRepository;
         $this->userRepository = $userRepository;
-
-        $this->updateBookingStatus();
     }
 
-    protected function updateBookingStatus()
+    public function updateBookingStatus()
     {
         $bookings = Booking::all();
         $now = Carbon::now();

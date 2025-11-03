@@ -144,8 +144,7 @@
                                 </div>
                             </div>
                             <div class="text-center mt-3">
-                                <button id="final-confirm" class="btn btn-warning px-5" disabled>Tiến hành thanh
-                                    toán</button>
+                                <button id="final-confirm" class="btn btn-warning px-5" disabled>Xác nhận</button>
                             </div>
                         </div>
                     </div>
@@ -257,11 +256,11 @@
                         if (showtimes.length === 0) continue;
 
                         html += `
-                                                                                                                    <div class="cinema-showtime-block mb-4 p-3 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid #444;">
-                                                                                                                        <h5 class="text-warning mb-2">${cinema.name}</h5>
-                                                                                                                        <p class="text-muted small mb-2">${cinema.address}</p>
-                                                                                                                        <div class="d-flex flex-wrap gap-2 justify-content-start">
-                                                                                                                `;
+                                         <div class="cinema-showtime-block mb-4 p-3 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid #444;" data-cinema-id="${cinema.id}">
+                                             <h5 class="text-warning mb-2">${cinema.name}</h5>
+                                             <p class="text-muted small mb-2">${cinema.address}</p>
+                                             <div class="d-flex flex-wrap gap-2 justify-content-start">
+                                                                                                  `;
 
                         showtimes.forEach(show => {
                             const time = new Date(show.starttime).toLocaleTimeString('vi-VN', {
@@ -269,9 +268,9 @@
                                 minute: '2-digit'
                             });
                             html += `
-                                                                                                                        <a href="/book/${movieId}/${show.id}" class="btn btn-outline-light btn-sm">
-                                                                                                                            ${time}
-                                                                                                                        </a>`;
+                                                                                                                                                                                                                <a href="/book/${movieId}/${show.id}" class="btn btn-outline-light btn-sm">
+                                                                                                                                                                                                                    ${time}
+                                                                                                                                                                                                                </a>`;
                         });
 
                         html += `</div></div>`;
@@ -307,7 +306,9 @@
                     const href = this.getAttribute('href');
                     selectedShowId = href.split('/').pop();
 
-                    const cinemaName = this.closest('.cinema-showtime-block').querySelector('h5').textContent;
+                    const cinemaBlock = this.closest('.cinema-showtime-block');
+                    const cinemaName = cinemaBlock.querySelector('h5').textContent;
+                    const cinemaId = cinemaBlock.dataset.cinemaId;
                     const showtimeText = this.textContent.trim();
 
                     // LẤY ROOM NAME
@@ -316,9 +317,19 @@
                     const roomRes = await fetch(`/api/v1/rooms/${show.roomId}`);
                     const room = await roomRes.json();
 
+                    let fullCinemaName = cinemaName;
+                    try {
+                        const cinemaRes = await fetch(`/api/v1/cinemas/${cinemaId}`);
+                        const cinema = await cinemaRes.json();
+                        fullCinemaName = `${cinema.name} (${cinema.city})`;
+                    } catch (err) {
+                        console.warn('Lỗi lấy city:', err);
+                    }
+
                     // CẬP NHẬT THÔNG TIN
                     selectedShowtimeInfo = {
-                        cinemaName,
+                        cinemaId,
+                        cinemaName: fullCinemaName,
                         roomName: room.name || `Rạp ${room.id}`,
                         showtime: showtimeText,
                         seats: [],
@@ -366,13 +377,25 @@
                 // Áp dụng style động
                 const style = document.createElement('style');
                 style.textContent = `
-                                                            #seat-map .seat-btn {
-                                                                width: ${seatSize}px !important;
-                                                                height: ${seatSize}px !important;
-                                                                font-size: ${fontSize}px !important;
-                                                            }
-                                                        `;
+                                                                                                                                                    #seat-map .seat-btn {
+                                                                                                                                                        width: ${seatSize}px !important;
+                                                                                                                                                        height: ${seatSize}px !important;
+                                                                                                                                                        font-size: ${fontSize}px !important;
+                                                                                                                                                    }
+                                                                                                                                                `;
                 document.head.appendChild(style);
+
+                let seatIdMap = {};
+                try {
+                    const seatRes = await fetch(`/api/v1/seats?roomId=${roomId}`);
+                    const seats = await seatRes.json(); // ← MẢNG [{id: 4748, seatnumber: "A1"}]
+                    seats.forEach(s => {
+                        seatIdMap[s.seatnumber] = s.id; // {"A1": 4748}
+                    });
+                    console.log('seatIdMap:', seatIdMap); // DEBUG
+                } catch (err) {
+                    console.error('Lỗi lấy seats:', err);
+                }
 
                 // === B2: LẤY GHẾ ĐÃ ĐẶT THEO showtimeId
                 const bookedSet = new Set();
@@ -409,13 +432,15 @@
                     for (let c = 1; c <= cols; c++) {
                         const seatNum = `${rowLetter}${c}`;
                         const isBooked = bookedSet.has(seatNum);
+                        const seatId = seatIdMap[seatNum] || null;
 
                         html += `
-                                                                                <button class="seat-btn ${isBooked ? 'booked' : 'available'}"
-                                                                                        data-seat="${seatNum}"
-                                                                                        ${isBooked ? 'disabled' : ''}>
-                                                                                    ${c}
-                                                                                </button>`;
+                                                                                                                                                                        <button class="seat-btn ${isBooked ? 'booked' : 'available'}"
+                                                                                                                                                                                data-seat="${seatNum}"
+                                                                                                                                                                                data-seat-id="${seatId}"
+                                                                                                                                                                                ${isBooked ? 'disabled' : ''}>
+                                                                                                                                                                            ${c}
+                                                                                                                                                                        </button>`;
                     }
                     html += `</div>`;
                 }
@@ -432,18 +457,32 @@
         // === 6. CHỌN GHẾ ===
         function attachSeatClick() {
             selectedSeats = [];
+            selectedSeatIds = [];
 
             document.querySelectorAll('.seat-btn.available').forEach(btn => {
+                const seatNum = btn.dataset.seat;
+                const seatId = btn.dataset.seatId ? parseInt(btn.dataset.seatId, 10) : null;
+
+                if (!seatId) {
+                    btn.disabled = true;
+                    btn.title = "Ghế lỗi dữ liệu";
+                    console.warn(`Ghế ${seatNum} không có ID`);
+                    return;
+                }
+
                 btn.addEventListener('click', function () {
                     const seat = this.dataset.seat;
                     if (this.classList.contains('selected')) {
                         this.classList.remove('selected');
-                        selectedSeats = selectedSeats.filter(s => s !== seat);
+                        selectedSeats = selectedSeats.filter(s => s !== seatNum);
+                                        selectedSeatIds = selectedSeatIds.filter(id => id !== seatId);
                     } else {
                         this.classList.add('selected');
-                        selectedSeats.push(seat);
+                        selectedSeats.push(seatNum);
+                        selectedSeatIds.push(seatId);
                     }
                     selectedShowtimeInfo.seats = selectedSeats;
+                    selectedShowtimeInfo.seatIds = selectedSeatIds;
                     updateSummaryBox();
                 });
             });
@@ -479,26 +518,42 @@
                 return;
             }
 
-            const checkoutData = {
-                movieId: {{ $movie->id }},
-                movieName: "{{ addslashes($movie->name) }}",
-                ageRating: "{{ $movie->agerating }}",
-                showtimeId: selectedShowId,
-                cinemaName: selectedShowtimeInfo.cinemaName,
-                roomName: selectedShowtimeInfo.roomName,
-                showtime: selectedShowtimeInfo.showtime,
-                seats: selectedSeats,
-                pricePerSeat: selectedShowtimeInfo.price,
-                totalPrice: selectedShowtimeInfo.price * selectedSeats.length
-            };
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            if (!csrfToken) {
-                alert('Lỗi: Thiếu CSRF token');
-                return;
-            }
-
             try {
+                const authRes = await fetch('/api/v1/auth/check');
+                const authData = await authRes.json();
+
+                if (!authData.authenticated) {
+                    // CHƯA ĐĂNG NHẬP → CHUYỂN ĐẾN TRANG LOGIN
+                    alert('Vui lòng đăng nhập để tiếp tục thanh toán!');
+                    window.location.href = '/auth'; // ← Trang đăng nhập
+                    return;
+                }
+
+                // ĐÃ ĐĂNG NHẬP → TIẾP TỤC
+                const user = authData.user;
+
+                const checkoutData = {
+                    movieId: "{{ $movie->id }}",
+                    movieName: "{{ addslashes($movie->name) }}",
+                    ageRating: "{{ $movie->agerating }}",
+                    showtimeId: selectedShowId,
+                    cinemaId: selectedShowtimeInfo.cinemaId,
+                    cinemaName: selectedShowtimeInfo.cinemaName,
+                    roomName: selectedShowtimeInfo.roomName,
+                    showtime: selectedShowtimeInfo.showtime,
+                    seats: selectedSeats,
+                    seatIds: selectedSeatIds,
+                    pricePerSeat: selectedShowtimeInfo.price,
+                    totalPrice: selectedShowtimeInfo.price * selectedSeats.length,
+                    userId: user.id
+                };
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                if (!csrfToken) {
+                    alert('Lỗi: Thiếu CSRF token');
+                    return;
+                }
+
                 const response = await fetch('/api/v1/checkout/prepare', {
                     method: 'POST',
                     headers: {
@@ -509,12 +564,13 @@
                     body: JSON.stringify(checkoutData)
                 });
 
+                const result = await response.json();
+
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Lỗi server');
+                    throw new Error(result.message || 'Lỗi server');
                 }
 
-                // THÀNH CÔNG → CHUYỂN QUA CHECKOUT
+                // CHUYỂN HƯỚNG QUA CHECKOUT
                 window.location.href = '/checkout';
 
             } catch (err) {

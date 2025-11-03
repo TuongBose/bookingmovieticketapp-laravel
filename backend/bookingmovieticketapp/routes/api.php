@@ -93,6 +93,7 @@ Route::prefix('v1/users')->group(function () {
 Route::prefix('v1/seats')->group(function () {
     Route::get('/', [SeatController::class, 'getSeatByRoomId']);
     Route::get('/{id}', [SeatController::class, 'getSeatById']);
+    Route::get('/seats/room/{roomId}/seat/{seatnumber}', [SeatController::class, 'getByRoomAndNumber']);
 });
 
 Route::prefix('v1/statistics')->group(function () {
