@@ -8,9 +8,6 @@
                 <!-- Poster + Info -->
                 <div class="col-md-4">
                     <img src="{{ $movie->posterurl }}" class="img-fluid rounded shadow" alt="{{ $movie->name }}">
-                    <div class="mt-3">
-                        <a href="#" class="btn btn-warning w-100">Mua vé ngay</a>
-                    </div>
                 </div>
 
                 <div class="col-md-8">
