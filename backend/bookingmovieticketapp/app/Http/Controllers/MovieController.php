@@ -8,6 +8,7 @@ use App\Services\Cinema\ICinemaService;
 use App\Services\Movie\IMovieService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class MovieController extends Controller
 {
@@ -27,13 +28,19 @@ class MovieController extends Controller
 
     public function getNowPlaying()
     {
-        $movies = $this->movieService->getNowPlaying();
+        $movies = Cache::remember('movies_now_playing', 600, function () {
+            return $this->movieService->getNowPlaying();
+        });
+
         return response()->json($movies);
     }
 
     public function getUpComing()
     {
-        $movies = $this->movieService->getUpComing();
+        $movies = Cache::remember('movies_upcoming', 600, function () {
+            return $this->movieService->getUpComing();
+        });
+
         return response()->json($movies);
     }
 
@@ -55,7 +62,10 @@ class MovieController extends Controller
 
     public function getAllMovie()
     {
-        $movies = $this->movieService->getAllMovie();
+        $movies = Cache::remember('movies_all', 600, function () {
+            return $this->movieService->getAllMovie();
+        });
+        
         return response()->json($movies);
     }
 

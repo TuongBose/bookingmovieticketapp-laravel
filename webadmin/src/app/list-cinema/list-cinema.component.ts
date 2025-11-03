@@ -81,7 +81,7 @@ export class ListCinemaComponent implements OnInit {
   }
 
   fetchProvinces(): void {
-    this.http.get<any[]>('https://provinces.open-api.vn/api/?depth=2').pipe(
+    this.http.get<any[]>('http://provinces.open-api.vn/api/?depth=2').pipe(
       timeout(500000), // Timeout sau 500 giây
       catchError(error => {
         console.error('Error fetching provinces:', error);

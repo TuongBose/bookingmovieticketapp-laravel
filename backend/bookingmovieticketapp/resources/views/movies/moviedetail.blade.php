@@ -256,11 +256,11 @@
                         if (showtimes.length === 0) continue;
 
                         html += `
-                                         <div class="cinema-showtime-block mb-4 p-3 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid #444;" data-cinema-id="${cinema.id}">
-                                             <h5 class="text-warning mb-2">${cinema.name}</h5>
-                                             <p class="text-muted small mb-2">${cinema.address}</p>
-                                             <div class="d-flex flex-wrap gap-2 justify-content-start">
-                                                                                                  `;
+                                             <div class="cinema-showtime-block mb-4 p-3 rounded" style="background: rgba(255,255,255,0.05); border: 1px solid #444;" data-cinema-id="${cinema.id}">
+                                                 <h5 class="text-warning mb-2">${cinema.name}</h5>
+                                                 <p class="text-muted small mb-2">${cinema.address}</p>
+                                                 <div class="d-flex flex-wrap gap-2 justify-content-start">
+                                                                                                      `;
 
                         showtimes.forEach(show => {
                             const time = new Date(show.starttime).toLocaleTimeString('vi-VN', {
@@ -268,9 +268,9 @@
                                 minute: '2-digit'
                             });
                             html += `
-                                                                                                                                                                                                                <a href="/book/${movieId}/${show.id}" class="btn btn-outline-light btn-sm">
-                                                                                                                                                                                                                    ${time}
-                                                                                                                                                                                                                </a>`;
+                                                                                                                                                                                                                    <a href="/book/${movieId}/${show.id}" class="btn btn-outline-light btn-sm">
+                                                                                                                                                                                                                        ${time}
+                                                                                                                                                                                                                    </a>`;
                         });
 
                         html += `</div></div>`;
@@ -361,6 +361,7 @@
                 const room = await roomRes.json();
                 const rows = room.seatrowmax;
                 const cols = room.seatcolumnmax;
+                const bookedSeatIds = new Set();
 
                 // Tính chiều rộng cần thiết
                 const estimatedWidth = cols * 46; // 38px + gap ~8px
@@ -377,12 +378,12 @@
                 // Áp dụng style động
                 const style = document.createElement('style');
                 style.textContent = `
-                                                                                                                                                    #seat-map .seat-btn {
-                                                                                                                                                        width: ${seatSize}px !important;
-                                                                                                                                                        height: ${seatSize}px !important;
-                                                                                                                                                        font-size: ${fontSize}px !important;
-                                                                                                                                                    }
-                                                                                                                                                `;
+                                                                                                                                                        #seat-map .seat-btn {
+                                                                                                                                                            width: ${seatSize}px !important;
+                                                                                                                                                            height: ${seatSize}px !important;
+                                                                                                                                                            font-size: ${fontSize}px !important;
+                                                                                                                                                        }
+                                                                                                                                                    `;
                 document.head.appendChild(style);
 
                 let seatIdMap = {};
@@ -406,13 +407,9 @@
 
                     // Lặp từng booking → lấy chi tiết ghế
                     for (const booking of bookings) {
-                        const detailRes = await fetch(`/api/v1/bookingdetails/${booking.id}/details`);
-                        const details = await detailRes.json();
-
-                        details.forEach(detail => {
-                            if (detail.seatnumber) {
-                                bookedSet.add(detail.seatnumber); // ← Ghế đã đặt
-                            }
+                        const details = await (await fetch(`/api/v1/bookingdetails/${booking.id}/details`)).json();
+                        details.forEach(d => {
+                            bookedSeatIds.add(d.seatId); // ← 4748, 4750
                         });
                     }
                 } catch (err) {
@@ -431,16 +428,16 @@
 
                     for (let c = 1; c <= cols; c++) {
                         const seatNum = `${rowLetter}${c}`;
-                        const isBooked = bookedSet.has(seatNum);
                         const seatId = seatIdMap[seatNum] || null;
+                        const isBooked = seatId ? bookedSeatIds.has(seatId) : false;
 
                         html += `
-                                                                                                                                                                        <button class="seat-btn ${isBooked ? 'booked' : 'available'}"
-                                                                                                                                                                                data-seat="${seatNum}"
-                                                                                                                                                                                data-seat-id="${seatId}"
-                                                                                                                                                                                ${isBooked ? 'disabled' : ''}>
-                                                                                                                                                                            ${c}
-                                                                                                                                                                        </button>`;
+                              <button class="seat-btn ${isBooked ? 'booked' : 'available'}"
+                                      data-seat="${seatNum}"
+                                      data-seat-id="${seatId}"
+                                      ${isBooked ? 'disabled' : ''}>
+                                  ${c}
+                              </button>`;
                     }
                     html += `</div>`;
                 }
@@ -475,7 +472,7 @@
                     if (this.classList.contains('selected')) {
                         this.classList.remove('selected');
                         selectedSeats = selectedSeats.filter(s => s !== seatNum);
-                                        selectedSeatIds = selectedSeatIds.filter(id => id !== seatId);
+                        selectedSeatIds = selectedSeatIds.filter(id => id !== seatId);
                     } else {
                         this.classList.add('selected');
                         selectedSeats.push(seatNum);
@@ -535,6 +532,7 @@
                 const checkoutData = {
                     movieId: "{{ $movie->id }}",
                     movieName: "{{ addslashes($movie->name) }}",
+                    posterurl:"{{ $movie->posterurl }}",
                     ageRating: "{{ $movie->agerating }}",
                     showtimeId: selectedShowId,
                     cinemaId: selectedShowtimeInfo.cinemaId,

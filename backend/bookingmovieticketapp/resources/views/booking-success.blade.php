@@ -9,10 +9,17 @@
         <div class="success-card text-center p-5">
             <i class="fa-solid fa-circle-check text-success" style="font-size: 80px;"></i>
             <h1 class="mt-4 text-white">ĐẶT VÉ THÀNH CÔNG!</h1>
-            <p class="text-muted">Mã đặt vé: <strong>#{{ session('success_data.bookingId') }}</strong></p>
+            <p class="text-light mb-2">Mã đặt vé: <strong class="text-warning fw-bold">#{{ session('success_data.bookingId') }}</strong></p>
 
             <div class="ticket mt-5 p-4" style="background: #1a1a1a; border: 2px dashed #ff9800; border-radius: 12px;">
-                <h4 class="text-warning">{{ session('success_data.movieName') }}</h4>
+                <!-- ẢNH + TÊN PHIM -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <img src="{{ session('success_data.posterurl') }}" 
+                         alt="{{ session('success_data.movieName') }}" 
+                         class="success-poster img-fluid rounded shadow"
+                         style="width: 80px; height: 120px; object-fit: cover;">
+                    <h4 class="text-warning mb-0">{{ session('success_data.movieName') }}</h4>
+                </div>
                 <div class="row text-start mt-3 text-white small">
                     <div class="col-md-6">
                         <p><strong>Rạp:</strong> {{ session('success_data.cinemaName') }}</p>

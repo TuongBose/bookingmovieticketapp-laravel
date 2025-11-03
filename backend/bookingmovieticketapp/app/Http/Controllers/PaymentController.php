@@ -31,6 +31,7 @@ class PaymentController extends Controller
         $data = $request->validate([
             'movieId' => 'required|exists:movies,id',
             'movieName' => 'required|string',
+            'posterurl' => 'required|string',
             'ageRating' => 'required|string',
             'showtimeId' => 'required|exists:showtimes,id',
             'cinemaId' => 'required|exists:cinemas,id',
@@ -84,83 +85,128 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Dữ liệu đặt vé không tồn tại'], 400);
         }
 
+        $paymentMethod = $request->input('payment_method');
+        if (!in_array($paymentMethod, ['momo', 'vnpay', 'shopeepay', 'bank_transfer'])) {
+            return redirect()->back()->withErrors(['payment_method' => 'Phương thức không hợp lệ']);
+        }
+
         // === 1. LẤY USER ĐÃ ĐĂNG NHẬP ===
         if (!Auth::check()) {
             return response()->json(['error' => 'Vui lòng đăng nhập'], 401);
         }
         $userId = Auth::id();
 
-        // === 2. TẠO BOOKING ===
+        if ($paymentMethod === 'vnpay') {
+            $vnpUrl = $this->generateVNPayUrl($data, $userId);
+            return redirect($vnpUrl);
+        }
+        return $this->processDirectPayment($data, $userId, $paymentMethod);
+    }
+
+    private function processDirectPayment($data, $userId, $paymentMethod)
+    {
         $bookingData = [
             'userid' => $userId,
             'showtimeid' => $data['showtimeId'],
             'totalprice' => (int) $data['totalPrice'],
-            'paymentmethod' => 'momo',
+            'paymentmethod' => $paymentMethod,
             'paymentstatus' => 'ok'
         ];
 
         try {
-            // Tạo BookingRequest từ dữ liệu
             $bookingRequest = new BookingRequest($bookingData);
             $bookingRequest->setMethod('POST');
+            $validator = validator($bookingRequest->all(), $bookingRequest->rules());
+            if ($validator->fails())
+                throw new Exception('Dữ liệu không hợp lệ');
 
-            // Validate
-            $validator = validator($bookingRequest->all(), $bookingRequest->rules(), $bookingRequest->messages());
-            if ($validator->fails()) {
-                throw new Exception('Dữ liệu booking không hợp lệ: ' . implode(', ', $validator->errors()->all()));
-            }
-
-            // Gọi Service
             $booking = $this->bookingService->createBooking($bookingRequest);
-
-            // Kiểm tra kết quả
-            if (!$booking || !isset($booking->id)) {
-                throw new Exception('Tạo booking thất bại: Không nhận được ID');
-            }
+            if (!$booking || !isset($booking->id))
+                throw new Exception('Tạo booking thất bại');
 
             $bookingId = $booking->id;
 
-            // === 3. TẠO BOOKING DETAIL CHO TỪNG GHẾ ===
-            foreach ($data['seatIds'] as $index => $seatId) {
-                $detailData = [
-                    'bookingid' => $bookingId,
-                    'seatid' => $seatId, 
-                    'price' => (int) $data['pricePerSeat']
-                ];
-
+            foreach ($data['seatIds'] as $seatId) {
+                $detailData = ['bookingid' => $bookingId, 'seatid' => $seatId, 'price' => (int) $data['pricePerSeat']];
                 $detailRequest = new BookingDetailRequest($detailData);
                 $detailRequest->setMethod('POST');
-
-                $validator = validator($detailRequest->all(), $detailRequest->rules(), $detailRequest->messages());
-                if ($validator->fails()) {
-                    Log::warning("Validate ghế $seatId thất bại", $validator->errors()->toArray());
-                    continue;
-                }
-
-                $detail = $this->bookingDetailService->createBookingDetail($detailRequest);
-                if (!$detail) {
-                    Log::error("Tạo booking detail thất bại cho ghế: $seatId");
-                }
+                $this->bookingDetailService->createBookingDetail($detailRequest);
             }
 
-            // === 5. XÓA SESSION ===
             session()->forget('checkout_data');
 
-            // === 6. CHUYỂN HƯỚNG THÀNH CÔNG ===
-            return redirect('/booking-success')
-                ->with('success_data', [
-                    'bookingId' => $bookingId,
-                    'movieName' => $data['movieName'],
-                    'cinemaName' => $data['cinemaName'],
-                    'roomName' => $data['roomName'],
-                    'showtime' => $data['showtime'],
-                    'seats' => $data['seats'],
-                    'totalPrice' => $data['totalPrice']
-                ]);
+            return redirect('/booking-success')->with('success_data', [
+                'bookingId' => $bookingId,
+                'movieName' => $data['movieName'],
+                'posterurl' => $data['posterurl'],
+                'cinemaName' => $data['cinemaName'],
+                'roomName' => $data['roomName'],
+                'showtime' => $data['showtime'],
+                'seats' => $data['seats'],
+                'totalPrice' => $data['totalPrice'],
+                'paymentMethod' => ucfirst(str_replace('_', ' ', $paymentMethod))
+            ]);
 
         } catch (Exception $e) {
-            Log::error('Checkout confirm failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Thanh toán thất bại. Vui lòng thử lại.'], 500);
+            Log::error('Direct payment failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Thanh toán thất bại. Vui lòng thử lại.');
         }
+    }
+
+    private function generateVNPayUrl($data, $userId)
+    {
+        $vnp_TmnCode = "OZYHVEZ5"; // Thay bằng của bạn
+        $vnp_HashSecret = "O9G96CAW41KRP6YKLVNKA9W04L0B7XEN"; // Thay bằng của bạn
+        $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        $vnp_Returnurl = route('vnpay.callback'); // Route xử lý callback
+        $vnp_TxnRef = $userId . '_' . time();
+        $vnp_OrderInfo = "Thanh toan ve phim: " . $data['movieName'];
+        $vnp_OrderType = "billpayment";
+        $vnp_Amount = $data['totalPrice'] * 100;
+        $vnp_Locale = "vn";
+        $vnp_IpAddr = request()->ip();
+
+        $inputData = [
+            "vnp_Version" => "2.1.0",
+            "vnp_TmnCode" => $vnp_TmnCode,
+            "vnp_Amount" => $vnp_Amount,
+            "vnp_Command" => "pay",
+            "vnp_CreateDate" => date('YmdHis'),
+            "vnp_CurrCode" => "VND",
+            "vnp_IpAddr" => $vnp_IpAddr,
+            "vnp_Locale" => $vnp_Locale,
+            "vnp_OrderInfo" => $vnp_OrderInfo,
+            "vnp_OrderType" => $vnp_OrderType,
+            "vnp_ReturnUrl" => $vnp_Returnurl,
+            "vnp_TxnRef" => $vnp_TxnRef,
+        ];
+
+        ksort($inputData);
+        $hashdata = http_build_query($inputData, '', '&');
+        $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+        $vnp_Url = $vnp_Url . "?" . $hashdata . '&vnp_SecureHash=' . $vnpSecureHash;
+
+        return $vnp_Url;
+    }
+
+    public function vnpayCallback(Request $request)
+    {
+        $vnp_SecureHash = $request->vnp_SecureHash;
+        $inputData = $request->except('vnp_SecureHash');
+        ksort($inputData);
+        $hashdata = http_build_query($inputData, '', '&');
+        $secureHash = hash_hmac('sha512', $hashdata, "O9G96CAW41KRP6YKLVNKA9W04L0B7XEN");
+
+        if ($secureHash === $vnp_SecureHash && $request->vnp_ResponseCode == '00') {
+            // Thành công → xử lý như direct payment
+            [$userId, $timestamp] = explode('_', $request->vnp_TxnRef);
+            $data = session('checkout_data');
+            if ($data) {
+                $this->processDirectPayment($data, $userId, 'vnpay');
+            }
+            return redirect('/booking-success');
+        }
+
+        return redirect('/checkout')->with('error', 'Thanh toán VNPay thất bại: ' . $request->vnp_ResponseCode);
     }
 }

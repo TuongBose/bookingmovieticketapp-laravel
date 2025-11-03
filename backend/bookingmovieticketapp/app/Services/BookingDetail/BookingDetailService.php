@@ -62,7 +62,7 @@ class BookingDetailService implements IBookingDetailService
     public function getBookingDetailByBookingId(int $bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
-        $bookingDetails = BookingDetail::where('id', $booking->id)->get();
+        $bookingDetails = BookingDetail::where('bookingid', $booking->id)->get();
         return BookingDetailResource::collection($bookingDetails);
     }
 }
