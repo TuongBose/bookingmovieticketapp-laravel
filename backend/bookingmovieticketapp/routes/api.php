@@ -99,3 +99,5 @@ Route::prefix('v1/seats')->group(function () {
 Route::prefix('v1/statistics')->group(function () {
     Route::get('/', [StatisticController::class, 'getMonthlyStatistics']);
 });
+
+

@@ -48,3 +48,5 @@ Route::get('/booking-success', function () {
 })->name('booking.success');
 
 Route::get('/vnpay/callback', [PaymentController::class, 'vnpayCallback'])->name('vnpay.callback');
+
+Route::get('/search', [MovieController::class, 'searchPage'])->name('search.page');

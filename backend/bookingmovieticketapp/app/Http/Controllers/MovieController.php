@@ -9,6 +9,8 @@ use App\Services\Movie\IMovieService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Movie;
+ use Illuminate\Support\Facades\Log;
 
 class MovieController extends Controller
 {
@@ -98,4 +100,40 @@ class MovieController extends Controller
             abort(404, 'Phim không tồn tại');
         }
     }
+    //movie search
+    //     public function searchPage(Request $request)
+    // {
+    //     $keyword = trim($request->get('q', ''));
+
+    //     $movies = [];
+    //     if ($keyword) {
+    //         $movies = Movie::where('name', 'LIKE', "%{$keyword}%")
+    //             ->select('id', 'name', 'posterurl', 'releasedate','agerating')
+    //             ->limit(20)
+    //             ->get();
+    //     }
+
+    //     return view('search.results', compact('movies', 'keyword'));
+    // }
+   
+    public function searchPage(Request $request)
+    {
+        $keyword = trim($request->get('q', ''));
+
+        $movies = collect();
+
+        // Chỉ tìm khi có từ khóa
+        if ($keyword !== '') {
+            $movies = Movie::where('name', 'LIKE', "%{$keyword}%")
+                ->select('id', 'name', 'posterurl', 'releasedate', 'duration')
+                ->limit(20)
+                ->get();
+        }
+
+        return view('search.results', compact('movies', 'keyword'));
+    }
+
+
+    
+
 }
