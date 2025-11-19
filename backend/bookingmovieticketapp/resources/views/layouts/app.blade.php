@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
-    <!-- <link rel="stylesheet" href="{{ asset('css/custom_card.css') }}"> -->
+   
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <style>
@@ -19,7 +19,7 @@
             #0a0e1a 0%, 
             #1a1f2e 30%, 
             #2a1f3e 50%, 
-            #8b58a3 55%,   /* <-- Chỉ 1 đỉnh tím nhỏ */
+            #8b58a3 55%,   
             #1a1f2e 60%, 
             #0a0e1a 100%
         ) !important;
@@ -32,9 +32,8 @@
     @stack('styles')
 
 
-
 </head>
-<script src="{{ asset('js/search.js') }}"></script>
+
 
 <body>
     @include('partials.header')
@@ -46,5 +45,7 @@
     @include('partials.footer')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @yield('scripts')
+    @stack('scripts')
 </body>
 </html>

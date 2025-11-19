@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon; // Thư viện bắt buộc để quản lý thời gian
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -19,44 +20,100 @@ class AuthController extends Controller
         return view('auth.index');
     }
 
-    // --- 1. CHỨC NĂNG ĐĂNG NHẬP (KHÔNG HASH) ---
+    // // --- 1. CHỨC NĂNG ĐĂNG NHẬP (KHÔNG HASH) ---
+    // public function login(Request $request)
+    // {
+    //     // Xác thực SĐT và Mật khẩu
+    //     $request->validate([
+    //         'phone' => 'required|string|max:20',
+    //         'password' => 'required',
+    //     ]);
+
+    //     // TÌM NGƯỜI DÙNG BẰNG SĐT VÀ MẬT KHẨU THÔ (Plain Text)
+    //     // Đây là bước quan trọng để bỏ qua Hash::check
+    //     $user = User::where('phonenumber', $request->phone)
+    //         ->where('password', $request->password)
+    //         ->first();
+
+    //     if ($user) {
+
+    //         // 1. Kiểm tra trạng thái kích hoạt
+    //         if ($user->isactive == 0) {
+    //             return back()->with('error', 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.');
+    //         }
+
+    //         // 2. Đăng nhập thành công
+    //         Auth::login($user);
+
+    //         // 3. Chuyển hướng theo Role (1=Admin, 0=User)
+    //         if ($user->rolename == 1) {
+    //             return redirect()->intended('/admin');
+    //         }
+
+    //         // FIX LỖI: Chuyển hướng về Route có tên 'home' (URL '/')
+    //         return redirect()->intended(route('home'));
+    //     }
+
+    //     // Đăng nhập thất bại
+    //     throw ValidationException::withMessages([
+    //         'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
+    //     ]);
+    // }
     public function login(Request $request)
     {
-        // Xác thực SĐT và Mật khẩu
         $request->validate([
             'phone' => 'required|string|max:20',
             'password' => 'required',
         ]);
 
-        // TÌM NGƯỜI DÙNG BẰNG SĐT VÀ MẬT KHẨU THÔ (Plain Text)
-        // Đây là bước quan trọng để bỏ qua Hash::check
-        $user = User::where('phonenumber', $request->phone)
-            ->where('password', $request->password)
-            ->first();
+        // Tìm user theo số điện thoại
+        $user = User::where('phonenumber', $request->phone)->first();
 
-        if ($user) {
-
-            // 1. Kiểm tra trạng thái kích hoạt
-            if ($user->isactive == 0) {
-                return back()->with('error', 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.');
-            }
-
-            // 2. Đăng nhập thành công
-            Auth::login($user);
-
-            // 3. Chuyển hướng theo Role (1=Admin, 0=User)
-            if ($user->rolename == 1) {
-                return redirect()->intended('/admin');
-            }
-
-            // FIX LỖI: Chuyển hướng về Route có tên 'home' (URL '/')
-            return redirect()->intended(route('home'));
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
+            ]);
         }
 
-        // Đăng nhập thất bại
-        throw ValidationException::withMessages([
-            'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
-        ]);
+        // Kiểm tra trạng thái tài khoản
+        if ($user->isactive == 0) {
+            throw ValidationException::withMessages([
+                'phone' => ['Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.'],
+            ]);
+        }
+
+        $passwordCorrect = false;
+
+        // Trường hợp 1: Mật khẩu trong DB đã được hash → dùng Hash::check
+        if (Hash::needsRehash($user->password) || strlen($user->password) >= 60) {
+            $passwordCorrect = Hash::check($request->password, $user->password);
+        }
+
+        // Trường hợp 2: Mật khẩu vẫn là plain text → so sánh trực tiếp
+        if (!$passwordCorrect && $user->password === $request->password) {
+            $passwordCorrect = true;
+
+            // BONUS: Tự động hash lại mật khẩu cũ để lần sau dùng bcrypt 
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
+
+        if (!$passwordCorrect) {
+            throw ValidationException::withMessages([
+                'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
+            ]);
+        }
+
+        // Đăng nhập thành công
+        Auth::login($user);
+
+        // Chuyển hướng theo role
+        if ($user->rolename == 1) {
+            return redirect()->intended('/admin');
+        }
+
+        return redirect()->intended(route('home'));
     }
 
     // --- 2. CHỨC NĂNG ĐĂNG KÝ (KHÔNG HASH) ---

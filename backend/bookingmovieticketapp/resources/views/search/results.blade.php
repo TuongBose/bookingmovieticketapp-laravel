@@ -28,7 +28,7 @@
                 <i class="fa fa-search fa-5x text-muted mb-4 opacity-50"></i>
                 <h3 class="text-white">Hãy nhập tên phim để tìm kiếm</h3>
                 <p class="text-light mb-4">
-                    Ví dụ: <strong>Avengers</strong>, <strong>Sư Thầy</strong>, <strong>Nhà Có 5 Nàng Tiên</strong>
+                    Ví dụ: <strong>Frankenstein</strong>, <strong>Phi Vụ Động Trời 2</strong>
                 </p>
                 <a href="{{ url('/') }}" class="btn btn-outline-light px-4 rounded-pill">
                     <i class="fa fa-home me-2"></i>Quay về trang chủ
@@ -69,7 +69,7 @@
                                     <!-- NHÃN ĐỘ TUỔI -->
                                     <div class="age-badge-new position-absolute top-0 start-0 m-2 d-flex overflow-hidden">
                                         <div class="badge-right bg-dark text-warning fw-bold d-flex align-items-center justify-content-center px-2 text-uppercase">
-                                            {{ $movie->agerating ?? 'P' }}
+                                            {{ $movie->agerating ?? 'Chưa rõ' }}
                                         </div>
                                     </div>
 

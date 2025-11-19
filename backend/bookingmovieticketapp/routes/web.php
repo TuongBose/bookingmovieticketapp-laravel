@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ProfileController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -50,3 +51,22 @@ Route::get('/booking-success', function () {
 Route::get('/vnpay/callback', [PaymentController::class, 'vnpayCallback'])->name('vnpay.callback');
 
 Route::get('/search', [MovieController::class, 'searchPage'])->name('search.page');
+
+
+
+Route::get('/profile', [ProfileController::class, 'index'])
+    ->name('profile')
+    ->middleware('auth'); 
+
+Route::post('/profile/update', [ProfileController::class, 'update'])
+    ->name('profile.update')
+    ->middleware('auth');
+
+Route::post('/profile/avatar', [ProfileController::class, 'uploadAvatar'])
+    ->name('profile.avatar')
+    ->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
+});
