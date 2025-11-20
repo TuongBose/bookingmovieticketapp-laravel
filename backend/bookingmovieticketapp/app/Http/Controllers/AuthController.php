@@ -59,6 +59,63 @@ class AuthController extends Controller
     //         'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
     //     ]);
     // }
+    //====================
+    // public function login(Request $request)
+    // {
+    //     $request->validate([
+    //         'phone' => 'required|string|max:20',
+    //         'password' => 'required',
+    //     ]);
+
+    //     // Tìm user theo số điện thoại
+    //     $user = User::where('phonenumber', $request->phone)->first();
+
+    //     if (!$user) {
+    //         throw ValidationException::withMessages([
+    //             'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
+    //         ]);
+    //     }
+
+    //     // Kiểm tra trạng thái tài khoản
+    //     if ($user->isactive == 0) {
+    //         throw ValidationException::withMessages([
+    //             'phone' => ['Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.'],
+    //         ]);
+    //     }
+
+    //     $passwordCorrect = false;
+
+    //     // Trường hợp 1: Mật khẩu trong DB đã được hash → dùng Hash::check
+    //     if (Hash::needsRehash($user->password) || strlen($user->password) >= 60) {
+    //         $passwordCorrect = Hash::check($request->password, $user->password);
+    //     }
+
+    //     // Trường hợp 2: Mật khẩu vẫn là plain text → so sánh trực tiếp
+    //     if (!$passwordCorrect && $user->password === $request->password) {
+    //         $passwordCorrect = true;
+
+    //         // BONUS: Tự động hash lại mật khẩu cũ để lần sau dùng bcrypt 
+    //         $user->update([
+    //             'password' => Hash::make($request->password)
+    //         ]);
+    //     }
+
+    //     if (!$passwordCorrect) {
+    //         throw ValidationException::withMessages([
+    //             'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
+    //         ]);
+    //     }
+
+    //     // Đăng nhập thành công
+    //     Auth::login($user);
+
+    //     // Chuyển hướng theo role
+    //     if ($user->rolename == 1) {
+    //         return redirect()->intended('/admin');
+    //     }
+
+    //     return redirect()->intended(route('home'));
+    // }
     public function login(Request $request)
     {
         $request->validate([
@@ -84,21 +141,26 @@ class AuthController extends Controller
 
         $passwordCorrect = false;
 
-        // Trường hợp 1: Mật khẩu trong DB đã được hash → dùng Hash::check
-        if (Hash::needsRehash($user->password) || strlen($user->password) >= 60) {
+        // Kiểm tra mật khẩu có phải dạng HASH bcrypt không
+        $isHashed = preg_match('/^\$2[ayb]\$.{56}$/', $user->password);
+
+        // Nếu đã hash bcrypt → dùng Hash::check
+        if ($isHashed) {
             $passwordCorrect = Hash::check($request->password, $user->password);
+        } 
+        // Nếu là plain text → so sánh trực tiếp
+        else {
+            if ($user->password === $request->password) {
+                $passwordCorrect = true;
+
+                // Tự động hash lại mật khẩu để tăng bảo mật
+                $user->update([
+                    'password' => Hash::make($request->password)
+                ]);
+            }
         }
 
-        // Trường hợp 2: Mật khẩu vẫn là plain text → so sánh trực tiếp
-        if (!$passwordCorrect && $user->password === $request->password) {
-            $passwordCorrect = true;
-
-            // BONUS: Tự động hash lại mật khẩu cũ để lần sau dùng bcrypt 
-            $user->update([
-                'password' => Hash::make($request->password)
-            ]);
-        }
-
+        // Nếu sai mật khẩu
         if (!$passwordCorrect) {
             throw ValidationException::withMessages([
                 'phone' => ['Số điện thoại hoặc mật khẩu không đúng.'],
@@ -108,13 +170,14 @@ class AuthController extends Controller
         // Đăng nhập thành công
         Auth::login($user);
 
-        // Chuyển hướng theo role
+        // Điều hướng theo role
         if ($user->rolename == 1) {
             return redirect()->intended('/admin');
         }
 
         return redirect()->intended(route('home'));
     }
+
 
     // --- 2. CHỨC NĂNG ĐĂNG KÝ (KHÔNG HASH) ---
     public function register(Request $request)

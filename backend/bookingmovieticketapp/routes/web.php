@@ -24,7 +24,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 //--------------------------------------------------------------------------------------------------------------------
 
-Route::get('/{id}', [MovieController::class, 'moviedetail'])->name('movies.moviedetail')->where('id', '[1-9][0-9]*');
 
 Route::get('api/v1/auth/check', function () {
     if (Auth::check()) {
@@ -70,3 +69,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
 });
+Route::get('/{id}', [MovieController::class, 'moviedetail'])->name('movies.moviedetail')->where('id', '[1-9][0-9]*');
