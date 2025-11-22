@@ -25,7 +25,7 @@ return new class extends Migration {
 
         DB::table('cinemas')->insert([
             [
-                'name' => 'Galaxy Nguyễn Du',
+                'name' => 'CineJoy Nguyễn Du',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.773307, 106.693373',
                 'address' => '116 Nguyễn Du, Quận 1, TP.HCM',
@@ -34,7 +34,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_1_1746214967186.jpg',
             ],
             [
-                'name' => 'Galaxy Tân Bình',
+                'name' => 'CineJoy Tân Bình',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.790432, 106.640716',
                 'address' => '246 Nguyễn Hồng Đào, Quận Tân Bình, TP.HCM',
@@ -43,7 +43,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_2_1746215174736.jpg',
             ],
             [
-                'name' => 'Galaxy Quang Trung',
+                'name' => 'CineJoy Quang Trung',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.834759, 106.662373',
                 'address' => 'Lầu 3, TTTM CoopMart Foodcosa số 304A, Quang Trung, P.11, Q. Gò Vấp, Tp.HCM',
@@ -52,7 +52,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_3_1746215224604.jpg',
             ],
             [
-                'name' => 'Galaxy Long Xuyên',
+                'name' => 'CineJoy Long Xuyên',
                 'city' => 'Tỉnh An Giang',
                 'coordinates' => '10.384155, 105.436843',
                 'address' => 'Tầng 1, TTTM Nguyễn Kim, số 01 Trần Hưng Đạo, Phường Mỹ Bình, Thành phố Long Xuyên',
@@ -61,7 +61,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_4_1746375169224.jpg',
             ],
             [
-                'name' => 'Galaxy Đà Nẵng',
+                'name' => 'CineJoy Đà Nẵng',
                 'city' => 'Thành phố Đà Nẵng',
                 'coordinates' => '16.066701, 108.186900',
                 'address' => 'Tầng 3, TTTM Coop Mart, 478 Điện Biên Phủ, Quận Thanh Khê, Đà Nẵng',
@@ -70,7 +70,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_5_1746215401993.jpg',
             ],
             [
-                'name' => 'Galaxy Co.opXtra Linh Trung',
+                'name' => 'CineJoy Co.opXtra Linh Trung',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.867896, 106.776687',
                 'address' => 'Tầng trệt, TTTM Co.opXtra Linh Trung, số 934 Quốc Lộ 1A, Phường Linh Trung, Quận Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam',
@@ -79,7 +79,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_6_1746375325231.jpg',
             ],
             [
-                'name' => 'Galaxy Huỳnh Tấn Phát',
+                'name' => 'CineJoy Huỳnh Tấn Phát',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.712225, 106.736575',
                 'address' => 'Lầu 2, TTTM Coopmart, số 1362 Huỳnh Tấn Phát, khu phố 1, Phường Phú Mỹ, Quận 7, Tp.Hồ Chí Minh, Việt Nam.',
@@ -88,7 +88,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_7_1746215524120.jpg',
             ],
             [
-                'name' => 'Galaxy Sala',
+                'name' => 'CineJoy Sala',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.771500, 106.721782',
                 'address' => 'Tầng 3, Thiso Mall Sala, 10 Mai Chí Thọ, Phường Thủ Thiêm, Thành phố Thủ Đức',
@@ -97,7 +97,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_8_1746215129247.jpg',
             ],
             [
-                'name' => 'Galaxy Hải Phòng',
+                'name' => 'CineJoy Hải Phòng',
                 'city' => 'Thành phố Hải Phòng',
                 'coordinates' => '20.856159, 106.686521',
                 'address' => 'Lầu 7, TTTM Nguyễn Kim - Sài Gòn Mall, số 104 Lương Khánh Thiện',
@@ -106,7 +106,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_9_1746375448482.jpg',
             ],
             [
-                'name' => 'Galaxy Kinh Dương Vương',
+                'name' => 'CineJoy Kinh Dương Vương',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.749503, 106.628778',
                 'address' => '718 Kinh Dương Vương, Quận 6, TP.HCM',
@@ -115,7 +115,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_10_1746375548086.jpg',
             ],
             [
-                'name' => 'Galaxy Bến Tre',
+                'name' => 'CineJoy Bến Tre',
                 'city' => 'Tỉnh Bến Tre',
                 'coordinates' => '10.241207, 106.376721',
                 'address' => 'Lầu 1, TTTM Sense City 26A Trần Quốc Tuấn, Phường An Hội, TP. Bến Tre',
@@ -124,7 +124,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_11_1746375599036.jpg',
             ],
             [
-                'name' => 'Galaxy Mipec Long Biên',
+                'name' => 'CineJoy Mipec Long Biên',
                 'city' => 'Thành phố Hà Nội',
                 'coordinates' => '21.045421, 105.866193',
                 'address' => 'Tầng 6, TTTM Mipec Long Biên, Số 2, Phố Long Biên 2, Ngọc Lâm, Long Biên, Hà Nội',
@@ -133,7 +133,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_12_1746375758125.jpg',
             ],
             [
-                'name' => 'Galaxy Cà Mau',
+                'name' => 'CineJoy Cà Mau',
                 'city' => 'Tỉnh Cà Mau',
                 'coordinates' => '9.177908, 105.154540',
                 'address' => 'Lầu 2, TTTM Sense City, số 9, Trần Hưng Đạo, P.5, Tp. Cà Mau',
@@ -142,7 +142,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_13_1746375846069.jpg',
             ],
             [
-                'name' => 'Galaxy Trung Chánh',
+                'name' => 'CineJoy Trung Chánh',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.855339, 106.608343',
                 'address' => 'TTVH Quận 12, Số 09 Quốc Lộ 22, P. Trung Mỹ Tây, Quận 12',
@@ -151,7 +151,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_14_1746375944257.jpg',
             ],
             [
-                'name' => 'Galaxy Vinh',
+                'name' => 'CineJoy Vinh',
                 'city' => 'Tỉnh Nghệ An',
                 'coordinates' => '18.676724, 105.677608',
                 'address' => 'Lầu 5, Trung tâm Giải Trí City HUB – số 1 Lê Hồng Phong, thành phố Vinh',
@@ -160,7 +160,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_15_1746376009746.jpg',
             ],
             [
-                'name' => 'Galaxy Nguyễn Văn Quá',
+                'name' => 'CineJoy Nguyễn Văn Quá',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.847156, 106.634100',
                 'address' => '119B Nguyễn Văn Quá, Phường Đông Hưng Thuận, Quận 12',
@@ -169,7 +169,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_16_1746376125934.jpg',
             ],
             [
-                'name' => 'Galaxy Buôn Ma Thuột',
+                'name' => 'CineJoy Buôn Ma Thuột',
                 'city' => 'Tỉnh Đắk Lắk',
                 'coordinates' => '12.692365, 108.062186',
                 'address' => 'Tầng trệt, TTTM Coop Mart Buôn Ma Thuột, số 71 Nguyễn Tất Thành, Phường Tân An, Tp. Buôn Ma Thuột, Tỉnh Đắk Lắk, Việt Nam',
@@ -178,7 +178,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_17_1746376188767.jpg',
             ],
             [
-                'name' => 'Galaxy Nha Trang Center',
+                'name' => 'CineJoy Nha Trang Center',
                 'city' => 'Tỉnh Khánh Hòa',
                 'coordinates' => '12.248043, 109.196326',
                 'address' => 'Tầng 3, Trung Tâm Thương Mại Nha Trang Center - 20 Trần Phú, Nha Trang, Khánh Hòa',
@@ -187,7 +187,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_18_1746376268601.jpg',
             ],
             [
-                'name' => 'Galaxy Trường Chinh',
+                'name' => 'CineJoy Trường Chinh',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.818052, 106.630815',
                 'address' => 'Tầng 3 - Co.opMart TTTM Thắng Lợi - Số 2 Trường Chinh, Tây Thạnh, Tân Phú, Thành phố Hồ Chí Minh',
@@ -196,7 +196,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_19_1746376314673.jpg',
             ],
             [
-                'name' => 'Galaxy GO! Mall Bà Rịa',
+                'name' => 'CineJoy GO! Mall Bà Rịa',
                 'city' => 'Tỉnh Bà Rịa - Vũng Tàu',
                 'coordinates' => '10.492306, 107.169138',
                 'address' => 'Tầng 3 TTTM GO! Bà Rịa, Số 2A đường Nguyễn Đình Chiểu, KP1, P. Phước Hiệp, TP. Bà Rịa, Tỉnh Bà Rịa-Vũng Tàu',
@@ -205,7 +205,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_20_1746376394994.jpg',
             ],
             [
-                'name' => 'Galaxy Cine+ Gold Coast Nha Trang',
+                'name' => 'CineJoy Cine+ Gold Coast Nha Trang',
                 'city' => 'Tỉnh Khánh Hòa',
                 'coordinates' => '12.247836, 109.194918',
                 'address' => 'Tầng 8, TTTM Gold Coast Nha Trang - Số 1 Trần Hưng Đạo, P. Lộc Thọ, TP. Nha Trang',
@@ -214,7 +214,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_21_1746376448605.jpg',
             ],
             [
-                'name' => 'Galaxy Cine+ Thiso Phan Huy Ích',
+                'name' => 'CineJoy Cine+ Thiso Phan Huy Ích',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.841520, 106.637373',
                 'address' => 'Tầng 4 TTTM Thiso Mall Trường Chinh - Phan Huy Ích - 385 Phan Huy Ích, Phường 14, Quận Gò Vấp, TP. HCM',
@@ -223,7 +223,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_22_1746376485825.jpg',
             ],
             [
-                'name' => 'Galaxy Aeon Mall Huế',
+                'name' => 'CineJoy Aeon Mall Huế',
                 'city' => 'Thành phố Huế',
                 'coordinates' => '16.454693, 107.615367',
                 'address' => 'Galaxy Aeon Mall Huế - Tầng 4 TTTM Aeon Mall Huế, Cửa số 5 và số 6, Sảnh Đỗ Quyên, 8 Võ Nguyên Giáp, An Đông, Huế, Thừa Thiên - Huế',
@@ -232,7 +232,7 @@ return new class extends Migration {
                 'imagename' => 'cinema_23_1746376523036.jpg',
             ],
             [
-                'name' => 'Galaxy Parc Mall Q8',
+                'name' => 'CineJoy Parc Mall Q8',
                 'city' => 'Thành phố Hồ Chí Minh',
                 'coordinates' => '10.740289, 106.678833',
                 'address' => 'Tầng 4 TTTM Parc Mall, 547-549 Tạ Quang Bửu, Phường 4, Quận 8',
