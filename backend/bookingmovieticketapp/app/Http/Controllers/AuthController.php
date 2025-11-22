@@ -141,23 +141,8 @@ class AuthController extends Controller
 
         $passwordCorrect = false;
 
-        // Kiểm tra mật khẩu có phải dạng HASH bcrypt không
-        $isHashed = preg_match('/^\$2[ayb]\$.{56}$/', $user->password);
-
-        // Nếu đã hash bcrypt → dùng Hash::check
-        if ($isHashed) {
-            $passwordCorrect = Hash::check($request->password, $user->password);
-        } 
-        // Nếu là plain text → so sánh trực tiếp
-        else {
-            if ($user->password === $request->password) {
-                $passwordCorrect = true;
-
-                // Tự động hash lại mật khẩu để tăng bảo mật
-                $user->update([
-                    'password' => Hash::make($request->password)
-                ]);
-            }
+        if ($user->password === $request->password) {
+            $passwordCorrect = true;
         }
 
         // Nếu sai mật khẩu
@@ -199,8 +184,9 @@ class AuthController extends Controller
             // Thông báo lỗi tiếng Việt tùy chỉnh
             'phone.unique' => 'Số điện thoại này đã được đăng ký.',
             'phone.regex' => 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.',
-            'email.regex' => 'Email phải có định dạng @gmail.com.', 
-            'email.unique' => 'Email này đã được đăng ký. Vui lòng sử dụng email khác.', 
+            'email.regex' => 'Email phải có định dạng @gmail.com.',
+            'email.unique' => 'Email này đã được đăng ký. Vui lòng sử dụng email khác.',
+            'password.min' => 'Mật khẩu phải có 6 ký tự trở lên.',
             'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
             'agree.accepted' => 'Bạn phải đồng ý với điều khoản dịch vụ.',
             // Thông báo lỗi mới cho 16 tuổi

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CinemaRequest;
 use App\Services\Cinema\ICinemaService;
 use Carbon\Carbon;
 use Exception;
@@ -109,23 +110,16 @@ class CinemaController extends Controller
         }
     }
 
-    public function createCinema(Request $request)
+    public function createCinema(CinemaRequest $cinemaRequest)
     {
         try {
-            $validated = Validator::make($request->all(), [
-                'name' => 'required|string',
-                'city' => 'required|string',
-                'coordinates' => 'required|string|regex:/^-?\d+\.\d+,\s*-?\d+\.\d+$/',
-                'address' => 'required|string',
-                'phonenumber' => 'required|regex:/^0\d{9,10}$/',
-                'maxroom' => 'required|integer|min:1',
-                'image' => 'nullable|image'
-            ])->validate();
 
-            $cinema = $this->cinemaService->createCinema((object) $validated);
+            Log::info($cinemaRequest);
 
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
+            $cinema = $this->cinemaService->createCinema( $cinemaRequest);
+
+            if ($cinemaRequest->hasFile('image')) {
+                $file = $cinemaRequest->file('image');
                 $fileName = 'cinema_' . $cinema->id . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('cinemas', $fileName, 'public');
                 $cinema->imagename = $fileName;
@@ -138,11 +132,10 @@ class CinemaController extends Controller
         }
     }
 
-    public function updateCinema(int $id, Request $request)
+    public function updateCinema(int $id, CinemaRequest $request)
     {
         try {
-            $cinemaDTO = (object) $request->all();
-            $cinema = $this->cinemaService->updateCinema($id, $cinemaDTO);
+            $cinema = $this->cinemaService->updateCinema($id, $request);
 
             if ($request->hasFile('image')) {
                 $file = $request->file('image');

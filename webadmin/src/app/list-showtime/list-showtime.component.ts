@@ -143,8 +143,10 @@ export class ListShowtimeComponent implements OnInit {
         this.bookingsCountMap.clear();
         this.showtimes.forEach(showtime => {
             this.showTimeService.getBookingsCountForShowTime(showtime.id).subscribe({
-                next: (count) => {
-                    this.bookingsCountMap.set(showtime.id, count);
+                next: (count:any) => {
+                    debugger
+                    const bookingsCount = count.bookingsCount;
+                    this.bookingsCountMap.set(showtime.id, bookingsCount);
                 },
                 error: (error) => {
                     console.error(`[loadBookingsCount] Lỗi khi lấy số lượng vé cho suất chiếu ${showtime.id}:`, error);

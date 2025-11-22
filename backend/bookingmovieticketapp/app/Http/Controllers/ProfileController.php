@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
- use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Hash;
 
 
 class ProfileController extends Controller
@@ -15,8 +15,8 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user->formatted_dob = $user->dateofbirth 
-            ? Carbon::parse($user->dateofbirth)->format('d/m/Y') 
+        $user->formatted_dob = $user->dateofbirth
+            ? Carbon::parse($user->dateofbirth)->format('d/m/Y')
             : '';
 
         return view('profile.index', compact('user'));
@@ -59,7 +59,7 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Thay đổi ảnh đại diện thành công!');
     }
-   
+
 
     public function changePassword()
     {
@@ -70,22 +70,20 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password'         => 'required|min:6|confirmed',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = Auth::user();
 
         // Nếu mật khẩu trong DB chưa hash → so sánh trực tiếp
         if ($user->password !== $request->current_password) {
-            // Nếu DB đã hash rồi thì mới dùng Hash::check
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'Mật khẩu cũ không đúng!']);
-            }
+            return back()->withErrors(['current_password' => 'Mật khẩu cũ không đúng!']);
+
         }
 
         // Lưu mật khẩu mới → lần này sẽ được hash tự động
         $user->update([
-            'password' => Hash::make($request->password)
+            'password' => $request->password
         ]);
 
         return back()->with('success', 'Đổi mật khẩu thành công!');

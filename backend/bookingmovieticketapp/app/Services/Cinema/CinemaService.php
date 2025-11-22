@@ -41,8 +41,8 @@ class CinemaService implements ICinemaService
             'address' => $cinemaRequest->address,
             'phonenumber' => $cinemaRequest->phonenumber,
             'maxroom' => $cinemaRequest->maxroom,
-            'imagename' => $cinemaRequest->imagename,
-            'isactive' => $cinemaRequest->isactive,
+            // 'imagename' => $cinemaRequest->imagename,
+            'isactive' => $cinemaRequest->isactive ==='true'?1:0,
         ]);
     }
 
@@ -56,7 +56,7 @@ class CinemaService implements ICinemaService
             'address' => $cinemaRequest->address,
             'phonenumber' => $cinemaRequest->phonenumber,
             'maxroom' => $cinemaRequest->maxroom,
-            'isactive' => $cinemaRequest->isactive,
+            'isactive' => $cinemaRequest->isactive==='true'?1:0,
         ]);
         return $cinema;
     }

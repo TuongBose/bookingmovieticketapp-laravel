@@ -28,8 +28,8 @@ class CinemaRequest extends FormRequest
             "address"=> "required|string|max:255",
             "phonenumber"=> "required|string|max:20",
             "maxroom"=> "required|integer|min:1",
-            "imagename"=> "required|string|max:100",
-            "isactive"=> "boolean",
+            // "imagename"=> "required|string|max:100",
+            "isactive"=> "nullable",
         ];
     }
 
@@ -43,7 +43,7 @@ class CinemaRequest extends FormRequest
             'maxroom.integer' => 'Số lượng phòng chiếu phải là số nguyên.',
             'maxroom.min' => 'Số lượng phòng chiếu tối thiểu là 1.',
             'phonenumber.max' => 'Số điện thoại không được vượt quá 20 ký tự.',
-            'imagename.max' => 'Tên hình ảnh không được vượt quá 100 ký tự.',
+            // 'imagename.max' => 'Tên hình ảnh không được vượt quá 100 ký tự.',
         ];
     }
 }
