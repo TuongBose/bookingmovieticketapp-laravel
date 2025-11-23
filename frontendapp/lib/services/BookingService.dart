@@ -53,7 +53,8 @@ class BookingService {
         headers: {'Accept': 'application/json; charset=UTF-8'},
       );
       if (response.statusCode == 200) {
-        final int data = int.parse(response.body);
+        String stringValue = jsonDecode(response.body);
+        final int data = int.parse(stringValue);
         return data;
       } else {
         throw Exception('Failed to load totalprice: ${response.statusCode}');
