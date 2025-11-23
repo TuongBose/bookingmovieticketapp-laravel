@@ -91,7 +91,8 @@ class _CinemaScreenState extends State<CinemaScreen> {
                   );
                 }
 
-                final cinemas = snapshot.data!.where((cinema) => cinema.isActive).toList();
+                final cinemas =
+                    snapshot.data!.where((cinema) => cinema.isActive).toList();
 
                 return ListView.separated(
                   itemCount: cinemas.length,
@@ -126,11 +127,8 @@ class _CinemaScreenState extends State<CinemaScreen> {
                               borderRadius: BorderRadius.circular(8),
                               child:
                                   cinema.imageName != null
-                                      ? Image.network(
-                                        _cinemaService.getCinemaImageUrl(
-                                          cinema.id,
-                                          cinema.imageName,
-                                        ),
+                                      ? Image.asset(
+                                        'assets/images/cinemas/${cinema.imageName}',
                                         width: 150,
                                         height: 100,
                                         fit: BoxFit.cover,

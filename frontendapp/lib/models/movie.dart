@@ -33,7 +33,9 @@ class Movie {
       posterUrl: json['posterurl'],
       bannerUrl: json['bannerurl'],
       ageRating: json['agerating'],
-      voteAverage: (json['voteaverage'] as num).toDouble(),
+      voteAverage: json['voteaverage'] is String
+          ? double.parse(json['voteaverage'] as String)
+          : (json['voteaverage'] as num).toDouble(),
       director: json['director'],
     );
   }

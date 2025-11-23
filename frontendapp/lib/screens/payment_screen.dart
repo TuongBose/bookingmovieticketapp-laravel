@@ -161,7 +161,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Uri _generateVNPayUrl(double amount) {
     // Replace these with your VNPay test credentials
     const String vnpTmnCode = "OZYHVEZ5"; // Test TMN Code
-    const String vnpHashSecret = "8KWHSG7DRHHXBD2FR0IVE60BG1W84G0U"; // Test Hash Secret
+    const String vnpHashSecret = "O9G96CAW41KRP6YKLVNKA9W04L0B7XEN"; // Test Hash Secret
     final String vnpTxnRef = DateTime.now().millisecondsSinceEpoch.toString();
     final String vnpOrderInfo = "Thanh toan ve xem phim";
     final String vnpAmount = (amount * 100).toInt().toString();

@@ -28,7 +28,6 @@ class UserRequest extends FormRequest
             'retypepassword'=> 'required|same:password',
             'phonenumber'   => 'required|string|max:20',
             'dateofbirth'   => 'required|date_format:Y-m-d',
-            'address'       => 'nullable|string|max:255',
         ];
     }
 
