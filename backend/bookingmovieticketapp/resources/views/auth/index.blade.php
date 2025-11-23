@@ -40,10 +40,6 @@
             <span class="error-message">{{ $message }}</span>
             @enderror
 
-            <div class="forgot-link">
-                <a href="#" id="forgotLink">Quên mật khẩu?</a>
-            </div>
-
             <button type="submit">Đăng nhập</button>
         </form>
 
