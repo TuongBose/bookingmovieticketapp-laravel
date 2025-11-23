@@ -114,14 +114,14 @@
                             </a>
                         </li>
 
-                        @if(Auth::user()->rolename == 1 || Auth::user()->rolename === true)
+                        <!-- @if(Auth::user()->rolename == 1 || Auth::user()->rolename === true)
                             <li>
                                 <a class="dropdown-item text-danger fw-bold" href="#">
                                     <i class="fas fa-crown me-3"></i>
                                     Quản trị hệ thống
                                 </a>
                             </li>
-                        @endif
+                        @endif -->
 
                         <li><hr class="dropdown-divider my-1"></li>
 

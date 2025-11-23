@@ -100,21 +100,7 @@ class MovieController extends Controller
             abort(404, 'Phim không tồn tại');
         }
     }
-    //movie search
-    //     public function searchPage(Request $request)
-    // {
-    //     $keyword = trim($request->get('q', ''));
-
-    //     $movies = [];
-    //     if ($keyword) {
-    //         $movies = Movie::where('name', 'LIKE', "%{$keyword}%")
-    //             ->select('id', 'name', 'posterurl', 'releasedate','agerating')
-    //             ->limit(20)
-    //             ->get();
-    //     }
-
-    //     return view('search.results', compact('movies', 'keyword'));
-    // }
+   
    
     public function searchPage(Request $request)
     {
@@ -125,7 +111,7 @@ class MovieController extends Controller
         // Chỉ tìm khi có từ khóa
         if ($keyword !== '') {
             $movies = Movie::where('name', 'LIKE', "%{$keyword}%")
-                ->select('id', 'name', 'posterurl', 'releasedate', 'duration')
+                ->select('id', 'name', 'posterurl', 'duration','agerating')
                 ->limit(20)
                 ->get();
         }

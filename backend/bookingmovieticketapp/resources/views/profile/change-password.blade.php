@@ -36,7 +36,7 @@
 
                         <h3 class="fw-bold mb-1 text-shadow">{{ Auth::user()->name }}</h3>
                         <p class="mb-3 opacity-75">Thành viên của CineJoy</p>
-                        <div class="membership-badge mb-4">
+                         <div class="membership-badge">
                             <span class="badge-text">C'Friends</span>
                         </div>
 
@@ -188,7 +188,15 @@
         cursor:pointer; transition:0.3s; }
     .avatar-btn input{ display:none; }
 
-    .membership-badge{ background:linear-gradient(45deg,#ffd700,#ffb800); padding:10px 30px; border-radius:50px; font-weight:bold; }
+    .membership-badge {
+        background: linear-gradient(45deg, #ffd700, #ffb800);
+        color: #000;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: bold;
+        display: inline-block;
+        box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+    }
     .menu-item{ display:flex; align-items:center; padding:14px 20px; margin-bottom:8px; color:white; transition:0.3s; border-radius:12px; }
     .menu-item:hover, .menu-item.active{ background:rgba(255,255,255,0.2); transform:translateX(12px); }
 

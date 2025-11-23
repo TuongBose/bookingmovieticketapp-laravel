@@ -67,7 +67,7 @@ class ProfileController extends Controller
     }
 
     public function updatePassword(Request $request)
-    {
+{
         $request->validate([
             'current_password' => 'required',
             'password' => 'required|min:6|confirmed',
@@ -75,17 +75,16 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        // Nếu mật khẩu trong DB chưa hash → so sánh trực tiếp
+        // So sánh mật khẩu dạng plain text
         if ($user->password !== $request->current_password) {
             return back()->withErrors(['current_password' => 'Mật khẩu cũ không đúng!']);
-
         }
 
-        // Lưu mật khẩu mới → lần này sẽ được hash tự động
-        $user->update([
-            'password' => $request->password
-        ]);
+        // Lưu mật khẩu mới dạng plain text
+        $user->password = $request->password;
+        $user->save();
 
         return back()->with('success', 'Đổi mật khẩu thành công!');
     }
+
 }

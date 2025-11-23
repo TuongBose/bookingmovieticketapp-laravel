@@ -72,7 +72,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} Cinestar – Hệ thống rạp chiếu phim hiện đại. Mọi quyền được bảo lưu.</p>
+            <p>&copy; {{ date('Y') }} CineJoy – Hệ thống rạp chiếu phim hiện đại. Mọi quyền được bảo lưu.</p>
         </div>
 
     </div>
